@@ -20,7 +20,7 @@ import {insertAkun, getAkun} from '../../Database/Database';
 const BuatAkun = () => {
   const navigation = useNavigation();
   const [namaLengkap, setNamaLengkap] = useState('');
-  const [nidn, setNidn] = useState('');
+  const [nim, setNim] = useState('');
   const [namaPerguruan, setNamaPerguruan] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -43,7 +43,7 @@ const BuatAkun = () => {
   const handleSubmission = async () => {
     if (
       namaLengkap &&
-      nidn &&
+      nim &&
       namaPerguruan &&
       username &&
       password &&
@@ -51,13 +51,7 @@ const BuatAkun = () => {
     ) {
       try {
         if (password == konfirPass) {
-          await insertAkun(
-            namaLengkap,
-            nidn,
-            namaPerguruan,
-            username,
-            password,
-          );
+          await insertAkun(namaLengkap, nim, namaPerguruan, username, password);
           Alert.alert('INFO', 'Berhasil Menambahkan Akun', [
             {text: 'OKE', onPress: () => navigasi()},
           ]);
@@ -87,9 +81,9 @@ const BuatAkun = () => {
         icon: require('../../assets/icons/namaLengkap.png'),
       },
       {
-        label: 'Nidn',
-        placeholder: 'Masukkan Nidn Anda',
-        icon: require('../../assets/icons/Nidn.png'),
+        label: 'Nim',
+        placeholder: 'Masukkan Nim Anda',
+        icon: require('../../assets/icons/Nim.png'),
       },
       {
         label: 'Nama Perguruan Tinggi/Institut',
@@ -167,8 +161,8 @@ const BuatAkun = () => {
       case 'Nama Lengkap':
         setNamaLengkap(value);
         break;
-      case 'Nidn':
-        setNidn(value);
+      case 'Nim':
+        setNim(value);
         break;
       case 'Nama Perguruan Tinggi/Institut':
         setNamaPerguruan(value);
@@ -219,13 +213,13 @@ const BuatAkun = () => {
             style={{
               alignItems: 'center',
               marginBottom: h(4),
-              marginTop: h(3.4),
+              marginTop: h(4.5),
             }}>
             <TouchableOpacity
               style={{
                 width: w(75),
                 height: h(7),
-                backgroundColor: '#0F4473',
+                backgroundColor: '#2A2A2A',
                 justifyContent: 'center',
                 borderRadius: w(8),
               }}
