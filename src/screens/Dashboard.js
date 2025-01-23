@@ -233,28 +233,43 @@ const Dashboard = () => {
       ]);
     };
 
-    const dataMatkul = item;
-    const data = [
-      {
-        label: 'edit jadwal mengajar',
-        icon: require('../assets/icons/jadwalSet.png'),
-        link: 'EditJadwal',
-      },
-      {
-        label: 'hapus jadwal mengajar',
-        icon: require('../assets/icons/trash.png'),
-      },
-    ];
+    const dataJadwal = item;
+    let data = [];
+    if (kategori.title == 'kuliah') {
+      data = [
+        {
+          label: 'Edit Jadwal Kuliah',
+          icon: require('../assets/icons/jadwalSet.png'),
+          link: 'EditJadwal',
+        },
+        {
+          label: 'Hapus Jadwal Kuliah',
+          icon: require('../assets/icons/trash.png'),
+        },
+      ];
+    } else {
+      data = [
+        {
+          label: 'Edit Jadwal Tugas',
+          icon: require('../assets/icons/jadwalSet.png'),
+          link: 'EditTugas',
+        },
+        {
+          label: 'hapus jadwal kuliah',
+          icon: require('../assets/icons/trash.png'),
+        },
+      ];
+    }
 
     return data.map(({label, icon, link}, key) => (
       <View key={key}>
         <TouchableOpacity
           style={styles.buttonModal}
           onPress={() => {
-            if (label == 'edit jadwal mengajar') {
-              navigasi.navigate(link, {dataMatkul}, setModalVisible(false));
+            if (label == 'Edit Jadwal Kuliah' || label == 'Edit Jadwal Tugas') {
+              navigasi.navigate(link, {dataJadwal}, setModalVisible(false));
             } else {
-              deleteData(dataMatkul);
+              deleteData(dataJadwal);
               setModalVisible(false);
             }
           }}>
@@ -446,9 +461,9 @@ const Dashboard = () => {
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'space-around',
                     marginTop: h(1.1),
-                    paddingHorizontal: w(2.2),
+                    marginLeft: w(4.8),
+                    marginRight: w(4.8),
                   }}>
                   <View
                     style={{
@@ -461,7 +476,7 @@ const Dashboard = () => {
                         fontWeight: 'bold',
                         textTransform: 'capitalize',
                       }}>
-                      {item.namaMatkul}a
+                      {item.namaMatkul}
                     </Text>
                     <View
                       style={{
@@ -483,15 +498,17 @@ const Dashboard = () => {
                       PROGRAM
                     </Text>
                   </View>
-                  <TouchableOpacity
-                    style={{marginTop: h(1)}}
-                    onPress={() => openModal(item)}>
-                    <Image
-                      source={require('../assets/icons/settings.png')}
-                      style={{width: w(8), height: h(3.6)}}
-                      resizeMode={'center'}
-                    />
-                  </TouchableOpacity>
+                  {kategori.title == 'tugas' ? (
+                    <TouchableOpacity
+                      style={{marginTop: h(1), marginLeft: w(5.5)}}
+                      onPress={() => openModal(item)}>
+                      <Image
+                        source={require('../assets/icons/settings.png')}
+                        style={{width: w(8), height: h(3.6)}}
+                        resizeMode={'center'}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
                 <View
                   style={{

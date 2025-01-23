@@ -22,7 +22,7 @@ import {updateJadwalKuliah} from '../../../Database/Database';
 const EditJadwal = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const dataMatkul = route.params.dataMatkul;
+  const dataMatkul = route.params.dataJadwal;
   const [namaMataKuliah, setNamaMataKuliah] = useState('');
   const [hari, setHari] = useState('');
   const [kelas, setKelas] = useState('');
@@ -287,7 +287,7 @@ const EditJadwal = () => {
               marginTop: h(3),
               marginBottom: h(1.5),
             }}>
-            Edit Jadwal Mengajar
+            Edit Jadwal Kuliah
           </Text>
           {input()}
 
