@@ -5,11 +5,11 @@ import {NavigationContainer} from '@react-navigation/native';
 import SplashSc from './src/screens/SplashSc';
 import SplashSc2 from './src/screens/SplashSc2';
 import Login from './src/screens/Login';
-import BuatAkun from './src/screens/crud/BuatAkun';
+import BuatAkun from './src/screens/crud/Akun';
 import Dashboard from './src/screens/Dashboard';
-import TambahJadwal from './src/screens/crud/TambahJadwal';
-import EditJadwal from './src/screens/crud/EditJadwal';
-import TambahTugas from './src/screens/crud/TambahTugas';
+import TambahJadwal from './src/screens/crud/Kuliah/TambahJadwal';
+import EditJadwal from './src/screens/crud/Kuliah/EditJadwal';
+import TambahTugas from './src/screens/crud/Tugas/TambahTugas';
 import {
   getDatabase,
   buatAkun,

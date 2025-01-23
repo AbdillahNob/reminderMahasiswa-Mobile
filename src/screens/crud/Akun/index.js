@@ -12,10 +12,10 @@ import React, {useState, useEffect} from 'react';
 import {
   heightPercentageToDP as h,
   widthPercentageToDP as w,
-} from '../../utils/responsive';
+} from '../../../utils/responsive';
 import {StatusBar} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {insertAkun, getAkun} from '../../Database/Database';
+import {insertAkun, getAkun} from '../../../Database/Database';
 
 const BuatAkun = () => {
   const navigation = useNavigation();
@@ -78,32 +78,32 @@ const BuatAkun = () => {
       {
         label: 'Nama Lengkap',
         placeholder: 'Masukkan Nama Lengkap Anda',
-        icon: require('../../assets/icons/namaLengkap.png'),
+        icon: require('../../../assets/icons/namaLengkap.png'),
       },
       {
         label: 'Nim',
         placeholder: 'Masukkan Nim Anda',
-        icon: require('../../assets/icons/Nim.png'),
+        icon: require('../../../assets/icons/Nim.png'),
       },
       {
         label: 'Nama Perguruan Tinggi/Institut',
         placeholder: 'Masukkan Nama Perguruan Anda',
-        icon: require('../../assets/icons/perguruanTinggi.png'),
+        icon: require('../../../assets/icons/perguruanTinggi.png'),
       },
       {
         label: 'Username',
         placeholder: 'Masukkan Username Anda',
-        icon: require('../../assets/icons/User.png'),
+        icon: require('../../../assets/icons/User.png'),
       },
       {
         label: 'Password',
         placeholder: 'Masukkan Password Anda',
-        icon: require('../../assets/icons/Password.png'),
+        icon: require('../../../assets/icons/Password.png'),
       },
       {
         label: 'Konfirmasi Password',
         placeholder: 'Konfirmasi Password Anda',
-        icon: require('../../assets/icons/Password.png'),
+        icon: require('../../../assets/icons/Password.png'),
       },
     ];
 
@@ -190,7 +190,7 @@ const BuatAkun = () => {
       />
       <View style={{position: 'absolute', top: h(-20)}}>
         <Image
-          source={require('../../assets/images/dosenMengajar.jpg')}
+          source={require('../../../assets/images/dosenMengajar.jpg')}
           style={{width: w('100%'), height: h(40)}}
           resizeMode={'cover'}
         />

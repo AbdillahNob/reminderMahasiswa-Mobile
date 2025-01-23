@@ -12,11 +12,11 @@ import React, {useEffect, useState} from 'react';
 import {
   heightPercentageToDP as h,
   widthPercentageToDP as w,
-} from '../../utils/responsive';
+} from '../../../utils/responsive';
 import {StatusBar} from 'react-native';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
-import {insertJadwalKuliah} from '../../Database/Database';
+import {insertJadwalKuliah} from '../../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TambahTugas = () => {
@@ -211,7 +211,7 @@ const TambahTugas = () => {
       />
       <View style={{position: 'absolute', top: h(-20)}}>
         <Image
-          source={require('../../assets/images/mengajarTeknologi.jpg')}
+          source={require('../../../assets/images/mengajarTeknologi.jpg')}
           style={{width: w('100%'), height: h(40)}}
           resizeMode={'cover'}
         />

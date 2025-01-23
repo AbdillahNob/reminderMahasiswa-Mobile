@@ -8,119 +8,84 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   heightPercentageToDP as h,
   widthPercentageToDP as w,
-} from '../../utils/responsive';
+} from '../../../utils/responsive';
 import {StatusBar} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
-import {StackActions, useNavigation} from '@react-navigation/native';
-import {insertJadwalKuliah} from '../../Database/Database';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation, useRoute, StackActions} from '@react-navigation/native';
+import {updateJadwalKuliah} from '../../../Database/Database';
 
-const TambahJadwal = () => {
+const EditJadwal = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const dataMatkul = route.params.dataMatkul;
   const [namaMataKuliah, setNamaMataKuliah] = useState('');
-  const [semester, setSemester] = useState('');
   const [hari, setHari] = useState('');
   const [kelas, setKelas] = useState('');
   const [ruangan, setRuangan] = useState('');
   const [jamMulai, setJamMulai] = useState('');
   const [jamSelesai, setJamSelesai] = useState('');
   const [tipeJadwal, setTipeJadwal] = useState('');
-  const [aktifkan, setAktifkan] = useState(false);
-  const [idUser, setIdUser] = useState('');
-
-  const navigation = useNavigation();
-  useEffect(() => {
-    const checkUserSession = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem('idUser');
-
-        // Jika idUser ditemukan
-        if (storedUserId) {
-          setIdUser(storedUserId);
-        } else {
-          Alert.alert('ERROR', 'Akun Login tidak Valid!', [
-            {
-              text: 'OKE',
-              onPress: () => {
-                navigation.dispatch(StackActions.replace('Dashboard'));
-              },
-            },
-          ]);
-        }
-      } catch (err) {
-        console.log(`Gagal memuat session: ${err}`);
-      }
-    };
-
-    checkUserSession();
-  }, []);
+  const [semester, setSemester] = useState('');
 
   const handleSubmission = async () => {
-    console.log(idUser);
-    if (
-      idUser &&
-      namaMataKuliah &&
-      semester &&
-      hari &&
-      kelas &&
-      ruangan &&
-      jamMulai &&
-      jamSelesai &&
-      tipeJadwal
-    ) {
-      try {
-        await insertJadwalKuliah(
-          idUser,
-          namaMataKuliah,
-          semester,
-          hari,
-          kelas,
-          ruangan,
-          jamMulai,
-          jamSelesai,
-          tipeJadwal,
-          aktifkan,
-        );
-        Alert.alert('INFO', 'Berhasil Menambah Data Jadwal', [
-          {text: 'OKE', onPress: () => navigasi()},
-        ]);
-      } catch (err) {
-        console.log(`Gagal mengirim Data Jadwal baru ${err}`);
-      }
-    } else {
-      Alert.alert('INFO', 'Error Harap semua inputan di isi!');
-    }
-  };
+    const updateNamaMatkul = namaMataKuliah || dataMatkul.namaMatkul;
+    const updateSemester = semester || dataMatkul.semester;
+    const updateHari = hari || dataMatkul.hari;
+    const updateKelas = kelas || dataMatkul.kelas;
+    const updateRuangan = ruangan || dataMatkul.ruangan;
+    const updateJamMulai = jamMulai || dataMatkul.jamMulai;
+    const updateJamSelesai = jamSelesai || dataMatkul.jamSelesai;
+    const updateTipeJadwal = tipeJadwal || dataMatkul.tipeJadwal;
 
-  const navigasi = () => {
-    navigation.dispatch(StackActions.replace('Dashboard'));
+    try {
+      await updateJadwalKuliah(
+        dataMatkul.idMengajar,
+        updateNamaMatkul,
+        updateSemester,
+        updateHari,
+        updateKelas,
+        updateRuangan,
+        updateJamMulai,
+        updateJamSelesai,
+        updateTipeJadwal,
+      );
+      Alert.alert('INFO', 'Berhasil EDIT Jadwal Mengajar', [
+        {
+          text: 'OKE',
+          onPress: () => navigation.dispatch(StackActions.replace('Dashboard')),
+        },
+      ]);
+    } catch (err) {
+      console.log('Fungsi HandleSubmission Gagal : ', err);
+    }
   };
 
   const input = () => {
     const data = [
       {
         label: 'Nama Mata Kuliah',
-        placeholder: 'Masukkan Nama Mata Kuliah',
+        placeholder: dataMatkul.namaMatkul,
       },
       {
         label: 'Semester',
-        placeholder: '--- Pilih Semester ---',
+        placeholder: dataMatkul.semester,
       },
       {
         label: 'Hari',
-        placeholder: '--- Pilih Hari ---',
+        placeholder: dataMatkul.hari,
       },
       {
         label: 'Kelas',
-        placeholder: 'Masukkan Nama Kelas',
+        placeholder: dataMatkul.kelas,
       },
       {
         label: 'Ruangan',
-        placeholder: 'Masukkan Ruangan',
+        placeholder: dataMatkul.ruangan,
       },
       {
         label: 'Jam Mulai',
@@ -132,7 +97,7 @@ const TambahJadwal = () => {
       },
       {
         label: 'Tipe Jadwal',
-        placeholder: '--- Pilih Tipe Jadwal ---',
+        placeholder: dataMatkul.tipeJadwal,
       },
     ];
 
@@ -145,10 +110,14 @@ const TambahJadwal = () => {
     if (label == 'Hari') {
       content = (
         <Picker
-          selectedValue={hari}
+          placeholder={placeholder}
           style={styles.picker}
           onValueChange={itemValue => setHari(itemValue)}>
-          <Picker label="--Pilih Hari--" value="" style={{color: 'black'}} />
+          <Picker
+            label={dataJadwalMatkul(label)}
+            value={dataJadwalMatkul(label)}
+            style={{color: 'black'}}
+          />
           <Picker.Item label="Senin" value="Senin" style={{color: 'black'}} />
           <Picker.Item label="Selasa" value="Selasa" style={{color: 'black'}} />
           <Picker.Item label="Rabu" value="Rabu" style={{color: 'black'}} />
@@ -167,14 +136,18 @@ const TambahJadwal = () => {
 
       content = (
         <Picker
-          selectedValue={label == 'Semester' ? semester : tipeJadwal}
+          placeholder={placeholder}
           style={styles.picker}
           onValueChange={itemValue =>
             label == 'Semester'
               ? setSemester(itemValue)
               : setTipeJadwal(itemValue)
           }>
-          <Picker.Item label={placeholder} value="" style={{color: 'black'}} />
+          <Picker.Item
+            label={dataJadwalMatkul(label)}
+            value=""
+            style={{color: 'black'}}
+          />
           {data.map((value, key) => (
             <Picker.Item
               key={key}
@@ -269,6 +242,26 @@ const TambahJadwal = () => {
     }
   };
 
+  const dataJadwalMatkul = label => {
+    if (label == 'Nama Mata Kuliah') {
+      return dataMatkul.namaMatkul;
+    } else if (label == 'Hari') {
+      return dataMatkul.hari;
+    } else if (label == 'Kelas') {
+      return dataMatkul.kelas;
+    } else if (label == 'Ruangan') {
+      return dataMatkul.ruangan;
+    } else if (label == 'Jam Mulai') {
+      return dataMatkul.jamMulai;
+    } else if (label == 'Jam Selesai') {
+      return dataMatkul.jamSelesai;
+    } else if (label == 'Tipe Jadwal') {
+      return dataMatkul.tipeJadwal;
+    } else if (label == 'Semester') {
+      return dataMatkul.semester;
+    }
+  };
+
   return (
     <View style={{marginTop: h(20), flex: 1}}>
       <StatusBar
@@ -278,7 +271,7 @@ const TambahJadwal = () => {
       />
       <View style={{position: 'absolute', top: h(-20)}}>
         <Image
-          source={require('../../assets/images/mengajarTeknologi.jpg')}
+          source={require('../../../assets/images/dosenMengajar.jpg')}
           style={{width: w('100%'), height: h(40)}}
           resizeMode={'cover'}
         />
@@ -294,7 +287,7 @@ const TambahJadwal = () => {
               marginTop: h(3),
               marginBottom: h(1.5),
             }}>
-            Buat Jadwal Mengajar
+            Edit Jadwal Mengajar
           </Text>
           {input()}
 
@@ -320,7 +313,7 @@ const TambahJadwal = () => {
                   fontSize: w(6),
                   textTransform: 'uppercase',
                 }}>
-                buat
+                edit
               </Text>
             </TouchableOpacity>
           </View>
@@ -330,12 +323,12 @@ const TambahJadwal = () => {
   );
 };
 
-export default TambahJadwal;
+export default EditJadwal;
 
 const styles = StyleSheet.create({
   container: {
     width: w('100%'),
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F0F4FF',
     borderTopLeftRadius: w(8),
     borderTopRightRadius: w(8),
   },
