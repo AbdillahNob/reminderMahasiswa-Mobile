@@ -246,11 +246,11 @@ export const getJadwalKuliah = async idUser => {
           (tx, results) => {
             const rows = results.rows.raw();
             console.log('Jumlah Data Jadwal Mengajar : ', rows.length);
-            rows.map(data => {
-              console.log(
-                `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
-              );
-            });
+            // rows.map(data => {
+            //   console.log(
+            //     `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.idMengajar}`,
+            //   );
+            // });
 
             resolve(rows);
           },

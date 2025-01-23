@@ -86,45 +86,60 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
   };
 
   const schedule = () => {
-    return (
-      <>
-        <View
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            paddingHorizontal: w(1.2),
-          }}>
-          <Text style={{color: '#ffffff', fontSize: w(4), fontWeight: 'bold'}}>
-            {hariIni.length}
-          </Text>
-          <Text style={{color: '#ffffff', fontSize: w(3.2)}}>
-            Jadwal Hari ini
-          </Text>
+    const ketKuliah = [
+      {label: 'Kuliah Hari ini', value: hariIni.length},
+      {label: 'total kuliah', value: totalJadwal},
+    ];
+    return ketKuliah.map(({label, value}, key) => {
+      return (
+        <View key={key}>
+          <View
+            style={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingHorizontal: w(2),
+            }}>
+            <Text
+              style={{
+                color: '#ffffff',
+                fontSize: w(4),
+                fontWeight: 'bold',
+              }}>
+              {value}
+            </Text>
+            <Text
+              style={{
+                color: '#ffffff',
+                fontSize: w(3.2),
+                textTransform: 'capitalize',
+              }}>
+              {label}
+            </Text>
+          </View>
         </View>
-        <View
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            paddingHorizontal: w(1.2),
-          }}>
-          <Text style={{color: '#ffffff', fontSize: w(4), fontWeight: 'bold'}}>
-            {totalJadwal}
-          </Text>
-          <Text style={{color: '#ffffff', fontSize: w(3.2)}}>Total Jadwal</Text>
-        </View>
-      </>
-    );
+      );
+    });
   };
 
   return (
     <View style={styles.header}>
       <View
         style={{
-          marginTop: h(-1),
-          marginLeft: w(4),
+          marginTop: h(-2),
+          marginRight: w(4),
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'flex-end',
         }}>
+        <Text
+          style={{
+            color: 'green',
+            fontSize: w(3.5),
+            fontWeight: 'bold',
+            marginRight: w(1.8),
+          }}>
+          LOG OUT
+        </Text>
         <TouchableOpacity onPress={() => logout()}>
           <Image
             source={require('../assets/icons/logOut.png')}
@@ -132,15 +147,6 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
             style={{width: w(5), height: h(2.5)}}
           />
         </TouchableOpacity>
-        <Text
-          style={{
-            color: 'green',
-            fontSize: w(3.5),
-            fontWeight: 'bold',
-            marginLeft: w(1.5),
-          }}>
-          LOG OUT
-        </Text>
       </View>
       <View
         style={{
@@ -154,7 +160,7 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
           style={{
             flexDirection: 'column',
             marginRight: w(-10),
-            marginTop: h(1.2),
+            marginTop: h(-2.5),
           }}>
           <Text
             style={{
@@ -177,6 +183,7 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
               fontSize: w(2.6),
               marginLeft: w(3.5),
               textTransform: 'capitalize',
+              width: w(68),
             }}>
             Mahasiswa {dataUser ? dataUser.namaPerguruan : '-'}
           </Text>
@@ -186,35 +193,40 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
           style={{
             width: w(16),
             height: h(8),
-            marginRight: w(5.5),
-            marginTop: h(1),
+            marginRight: w(10),
+            top: h(2),
           }}
           resizeMode="cover"
         />
       </View>
-
       <View
         style={{
-          marginTop: h(3),
+          alignItems: 'flex-start',
           paddingLeft: w(3.5),
           flexDirection: 'row',
-          alignItems: 'center',
         }}>
-        <Image
-          source={require('../assets/icons/alarm-clock.png')}
-          style={{width: w(5), height: h(4)}}
-          resizeMode="center"
-        />
         <Text
           style={{
             color: '#ffffff',
             fontSize: w(2.7),
             width: w(45),
-            paddingLeft: w(2),
           }}>
-          Anda akan diingatkan sebanyak 2X dari setiap jadwal kuliah dan tugas
+          Anda akan diingatkan sebanyak 2X dari setiap jadwal dan tugas kuliah
           anda
         </Text>
+        <Image
+          source={require('../assets/icons/alarm-clock.png')}
+          resizeMode={'center'}
+          style={{height: h(2), width: w(4), marginTop: h(0.8)}}
+        />
+      </View>
+
+      <View
+        style={{
+          marginTop: h(1.5),
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}>
         {schedule()}
       </View>
 
@@ -222,6 +234,7 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
         style={{
           top: h(4.6),
           alignItems: 'center',
+          marginTop: h(-2.2),
         }}>
         <View
           style={{
@@ -244,7 +257,8 @@ const styles = StyleSheet.create({
     width: w('100%'),
     paddingTop: h(5),
     paddingBottom: h(5),
-    backgroundColor: '#0F4473',
+    backgroundColor: '#2A2A2A',
+    opacity: 0.94,
     justifyContent: 'center',
   },
 });

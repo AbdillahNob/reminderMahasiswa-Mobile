@@ -95,8 +95,8 @@ const Dashboard = () => {
         />
         <TouchableOpacity
           style={{
-            width: w(10),
-            height: h(5),
+            width: w(8),
+            height: h(4),
             backgroundColor: '#0F4473',
             elevation: 3,
             borderRadius: w(5),
@@ -109,7 +109,8 @@ const Dashboard = () => {
           onPress={() => navigasi.navigate('TambahJadwal')}>
           <Image
             source={require('../assets/icons/plus.png')}
-            style={{width: w(6), height: h(3)}}
+            resizeMode={'center'}
+            style={{width: w(5), height: h(2.5)}}
           />
         </TouchableOpacity>
       </View>
@@ -229,7 +230,7 @@ const Dashboard = () => {
   return (
     <View style={styles.container}>
       <Notifikasi refreshTrigger={refreshTrigger} />
-      <StatusBar backgroundColor={'#0F4473'} barStyle={'light-content'} />
+      <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
       {idUser || dataJadwal.length > 0 ? (
         <HeaderDashboard idUser={idUser} dataJadwal={dataJadwal} />
       ) : null}
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F0F4FF',
     paddingTop: h(-1),
-    marginTop: h(1),
+    marginTop: h(2),
   },
   card: {
     width: w('88%'),
