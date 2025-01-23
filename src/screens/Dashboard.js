@@ -18,7 +18,11 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import HeaderDashboard from '../components/HeaderDashboard';
 import {useNavigation} from '@react-navigation/native';
-import {getJadwal, hapusData, updateAlarmAktif} from '../Database/Database';
+import {
+  getJadwalKuliah,
+  hapusDataKuliah,
+  updateAktifKuliah,
+} from '../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notifikasi from './notifikasi/Notifikasi';
 
@@ -65,7 +69,7 @@ const Dashboard = () => {
 
   const fetch = async idUser => {
     try {
-      const hasil = await getJadwal(idUser);
+      const hasil = await getJadwalKuliah(idUser);
       setDataJadwal(hasil);
     } catch (error) {
       console.log(`Gagal Ambil data Jadwal : ${error}`);
@@ -82,7 +86,7 @@ const Dashboard = () => {
             fontWeight: 'bold',
             marginLeft: w(5),
           }}>
-          Jadwal Mengajar Anda{' '}
+          Jadwal kuliah Anda{' '}
         </Text>
         <Image
           source={require('../assets/icons/book.png')}
@@ -130,7 +134,7 @@ const Dashboard = () => {
           onPress: async () => {
             try {
               if (idMengajar) {
-                await hapusData(idMengajar);
+                await hapusDataKuliah(idMengajar);
 
                 Alert.alert(
                   'INFO',
@@ -199,7 +203,7 @@ const Dashboard = () => {
     // console.log(itemToUpdate);
 
     try {
-      await updateAlarmAktif(id, itemToUpdate.aktifkan);
+      await updateAktifKuliah(id, itemToUpdate.aktifkan);
       Alert.alert(
         'INFO',
         `Status Aktivasi Alarm ${

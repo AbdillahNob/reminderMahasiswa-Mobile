@@ -7,7 +7,7 @@ import notifee, {
   TriggerType,
 } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getJadwal} from '../../Database/Database';
+import {getJadwalKuliah} from '../../Database/Database';
 import ModalPesan from './ModalPesan';
 
 const Notifikasi = ({refreshTrigger}) => {
@@ -130,7 +130,7 @@ const Notifikasi = ({refreshTrigger}) => {
 
   const fetchJadwal = async userId => {
     try {
-      const hasil = await getJadwal(userId);
+      const hasil = await getJadwalKuliah(userId);
       setDataJadwal(hasil);
     } catch (err) {
       console.error('Error fetching schedule:', err);

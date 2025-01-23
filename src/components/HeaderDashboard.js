@@ -212,7 +212,8 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
             width: w(45),
             paddingLeft: w(2),
           }}>
-          Anda akan diingatkan sebanyak 3X dari setiap jadwal mengajar anda
+          Anda akan diingatkan sebanyak 2X dari setiap jadwal kuliah dan tugas
+          anda
         </Text>
         {schedule()}
       </View>

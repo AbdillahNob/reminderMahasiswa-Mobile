@@ -56,12 +56,12 @@ export const buatAkun = async () => {
 };
 
 // Buat Tabel Jadwal
-export const buatJadwal = async () => {
+export const buatJadwalKuliah = async () => {
   try {
     const db = await getDatabase(); //Tunggu getDatabase smpi database selesai dihubungkan
     await db.transaction(tx => {
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS jadwalMengajar (
+        `CREATE TABLE IF NOT EXISTS tbKuliah (
                 idMengajar INTEGER PRIMARY KEY AUTOINCREMENT,
                 idUser INTEGER,
                 namaMatkul TEXT,
@@ -125,7 +125,7 @@ export const insertAkun = async (
 };
 
 // Create Jadwal
-export const insertJadwal = async (
+export const insertJadwalKuliah = async (
   idUser,
   namaMatkul,
   semester,
@@ -141,7 +141,7 @@ export const insertJadwal = async (
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `INSERT INTO jadwalMengajar (idUser, namaMatkul, semester, hari, kelas, ruangan, jamMulai, jamSelesai, tipeJadwal, aktifkan) VALUES (?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO tbKuliah (idUser, namaMatkul, semester, hari, kelas, ruangan, jamMulai, jamSelesai, tipeJadwal, aktifkan) VALUES (?,?,?,?,?,?,?,?,?,?);`,
         [
           idUser,
           namaMatkul,
@@ -235,29 +235,27 @@ export const getAkunDetail = async idUser => {
 };
 
 // Read Data Jadwal
-export const getJadwal = async idUser => {
+export const getJadwalKuliah = async idUser => {
   try {
     const db = await getDatabase();
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
-          `SELECT * FROM jadwalMengajar WHERE idUser = ?`,
+          `SELECT * FROM tbKuliah WHERE idUser = ?`,
           [idUser],
           (tx, results) => {
             const rows = results.rows.raw();
             console.log('Jumlah Data Jadwal Mengajar : ', rows.length);
-            // rows.map(data => {
-            //   console.log(
-            //     `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
-            //   );
-            // });
+            rows.map(data => {
+              console.log(
+                `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
+              );
+            });
 
             resolve(rows);
           },
           (tx, error) => {
-            console.log(
-              `Error membaca data dari tabel jadwalMengajar : ${error}`,
-            );
+            console.log(`Error membaca data dari tabel tbKuliah : ${error}`);
             reject(error);
           },
         );
@@ -270,7 +268,7 @@ export const getJadwal = async idUser => {
 };
 
 // Update Jadwal
-export const updateJadwal = async (
+export const updateJadwalKuliah = async (
   idMengajar,
   namaMatkul,
   semester,
@@ -285,7 +283,7 @@ export const updateJadwal = async (
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `UPDATE jadwalMengajar SET namaMatkul = ?, semester = ?, hari = ?, kelas = ?, ruangan = ?, jamMulai = ?, jamSelesai = ?, tipeJadwal = ? WHERE idMengajar = ?`,
+        `UPDATE tbKuliah SET namaMatkul = ?, semester = ?, hari = ?, kelas = ?, ruangan = ?, jamMulai = ?, jamSelesai = ?, tipeJadwal = ? WHERE idMengajar = ?`,
         [
           namaMatkul,
           semester,
@@ -316,12 +314,12 @@ export const updateJadwal = async (
 };
 
 // Update
-export const updateAlarmAktif = async (idMengajar, aktifkan) => {
+export const updateAktifKuliah = async (idMengajar, aktifkan) => {
   try {
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `UPDATE jadwalMengajar SET aktifkan = ? WHERE idMengajar = ?`,
+        `UPDATE tbKuliah SET aktifkan = ? WHERE idMengajar = ?`,
         [aktifkan ? 1 : 0, idMengajar],
         (tx, results) => {
           console.log(`DEBUG Berhasil Edit Aktivasi Alarm : ${results}`);
@@ -336,12 +334,12 @@ export const updateAlarmAktif = async (idMengajar, aktifkan) => {
   }
 };
 // Hapus Data
-export const hapusData = async id => {
+export const hapusDataKuliah = async id => {
   try {
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `DELETE FROM jadwalMengajar WHERE idMengajar = ?;`,
+        `DELETE FROM tbKuliah WHERE idMengajar = ?;`,
         [id],
         (tx, results) => {
           if (results.rowsAffected > 0) {
@@ -387,7 +385,7 @@ export const cekTabel = async () => {
   const db = await getDatabase();
   db.transaction(tx => {
     tx.executeSql(
-      `PRAGMA table_info(jadwalMengajar);`,
+      `PRAGMA table_info(tbKuliah);`,
       [],
       (tx, results) => {
         const rows = results.rows.raw();
@@ -409,7 +407,7 @@ export const hapusTabel = async () => {
   const db = await openDb();
   db.transaction(tx => {
     tx.executeSql(
-      `DROP TABLE IF EXISTS tbAkun`,
+      `DROP TABLE IF EXISTS tbKuliah`,
       [],
       (tx, results) => {
         console.log('Berhasil Hapus Tabel');

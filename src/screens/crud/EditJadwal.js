@@ -17,7 +17,7 @@ import {StatusBar} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {useNavigation, useRoute, StackActions} from '@react-navigation/native';
-import {updateJadwal} from '../../Database/Database';
+import {updateJadwalKuliah} from '../../Database/Database';
 
 const EditJadwal = () => {
   const navigation = useNavigation();
@@ -43,7 +43,7 @@ const EditJadwal = () => {
     const updateTipeJadwal = tipeJadwal || dataMatkul.tipeJadwal;
 
     try {
-      await updateJadwal(
+      await updateJadwalKuliah(
         dataMatkul.idMengajar,
         updateNamaMatkul,
         updateSemester,

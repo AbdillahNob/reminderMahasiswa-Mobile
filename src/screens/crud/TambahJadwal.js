@@ -17,7 +17,7 @@ import {StatusBar} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
-import {insertJadwal} from '../../Database/Database';
+import {insertJadwalKuliah} from '../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TambahJadwal = () => {
@@ -73,7 +73,7 @@ const TambahJadwal = () => {
       tipeJadwal
     ) {
       try {
-        await insertJadwal(
+        await insertJadwalKuliah(
           idUser,
           namaMataKuliah,
           semester,
