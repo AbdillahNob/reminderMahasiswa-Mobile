@@ -42,7 +42,7 @@ const TambahJadwal = () => {
         if (storedUserId) {
           setIdUser(storedUserId);
         } else {
-          Alert.alert('ERROR', 'Akun Login tidak terdeteksi!', [
+          Alert.alert('ERROR', 'Akun Login tidak Valid!', [
             {
               text: 'OKE',
               onPress: () => {
