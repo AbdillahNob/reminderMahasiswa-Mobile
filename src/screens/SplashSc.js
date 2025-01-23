@@ -34,7 +34,7 @@ const SplashSc = () => {
 
   return (
     <View style={style.container}>
-      <StatusBar backgroundColor={'#0F4473'} barStyle={'light-content'} />
+      <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
       <View style={{alignItems: 'center'}}>
         <Image
           source={require('../assets/images/logoAlarm.png')}
@@ -46,7 +46,7 @@ const SplashSc = () => {
             textAlign: 'center',
             marginTop: h(0.8),
             fontSize: w(8),
-            color: '#F0A7A7',
+            color: '#D800FF',
           }}>
           ALARM APP
         </Text>
@@ -60,7 +60,7 @@ export default SplashSc;
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F4473',
+    backgroundColor: '#2A2A2A',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',

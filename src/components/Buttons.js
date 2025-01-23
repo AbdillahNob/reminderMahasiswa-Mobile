@@ -14,7 +14,7 @@ const Buttons = ({teks, navigasi}) => {
         style={{
           width: w(75),
           height: h(7),
-          backgroundColor: '#0F4473',
+          backgroundColor: '#2A2A2A',
           justifyContent: 'center',
           borderRadius: w(8),
         }}

@@ -7,7 +7,6 @@ import {
 } from '../utils/responsive';
 import {StackActions, useNavigation} from '@react-navigation/native';
 import Buttons from '../components/Buttons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashSc2 = () => {
   const navigation = useNavigation();
@@ -15,15 +14,16 @@ const SplashSc2 = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={'#0F4473'} barStyle={'light-content'} />
+      <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
       <View style={styles.container2}>
         <Text
           style={{
             fontWeight: 'bold',
             fontSize: w(8),
             textAlign: 'center',
+            textTransform: 'capitalize',
           }}>
-          Pengingat Jadwal Mengajar Dosen
+          Reminder jadwal dan tugas Perkuliahan Mahasiswa
         </Text>
         <Text
           style={{
@@ -31,11 +31,11 @@ const SplashSc2 = () => {
             marginTop: h(1.5),
             textAlign: 'center',
             color: '#948B8B',
-            paddingHorizontal: w(12),
+            paddingHorizontal: w(8),
           }}>
-          Aplikasi ini akan mengingatkan terkait jadwal mengajar anda secara
-          otomatis dan memberikan feedback terhadap mahasiswa dan staf FO (Front
-          Office)
+          Aplikasi ini akan mengingatkan terkait jadwal kuliah anda dan tugas
+          mahasiswa sehingga mahasiswa mudah mengingat dan mengatur pengerjaan
+          tugas dan jadwal kuliah anda secara otomatis
         </Text>
         <View
           style={{
@@ -75,7 +75,7 @@ const SplashSc2 = () => {
               height: h(7),
               marginTop: h(2.5),
               justifyContent: 'center',
-              backgroundColor: '#0F4473',
+              backgroundColor: '#2A2A2A',
               borderRadius: w(5),
             }}
             onPress={() => navigation.dispatch(StackActions.replace('Login'))}>
@@ -102,8 +102,8 @@ const SplashSc2 = () => {
         <Image
           source={require('../assets/images/mengajarTeknologi.jpg')}
           style={{
-            height: h(55),
-            width: w(75),
+            height: h(50),
+            width: w(71),
             borderTopLeftRadius: w(5),
             borderTopRightRadius: w(5),
             borderBottomLeftRadius: w(38),
@@ -121,14 +121,14 @@ export default SplashSc2;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F4473',
+    backgroundColor: '#2A2A2A',
     justifyContent: 'flex-end',
   },
   container2: {
     width: w('100%'),
     height: h(74.5),
     backgroundColor: '#ffffff',
-    paddingTop: h(34.5),
+    paddingTop: h(28),
     alignItems: 'center',
   },
 });
