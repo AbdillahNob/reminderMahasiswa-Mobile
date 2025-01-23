@@ -36,8 +36,8 @@ const Dashboard = () => {
   const [idUser, setIdUser] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [subMenu, setSubMenu] = useState([
-    {title: 'kuliah'},
-    {title: 'tugas'},
+    {title: 'kuliah', screen: 'tambahJadwal'},
+    {title: 'tugas', screen: 'tambahTugas'},
     {title: 'history'},
   ]);
 
@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   const headerMainView = () => {
     return (
-      <View style={{backgroundColor: '#F0F4FF'}}>
+      <View style={{backgroundColor: '#F5F5F5'}}>
         <View
           style={{
             marginTop: h(2),
@@ -170,7 +170,11 @@ const Dashboard = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
-              onPress={() => navigasi.navigate('TambahJadwal')}>
+              onPress={() =>
+                navigasi.navigate(
+                  kategori.title == 'kuliah' ? 'TambahJadwal' : 'TambahTugas',
+                )
+              }>
               <Image
                 source={require('../assets/icons/plus.png')}
                 resizeMode={'center'}
@@ -651,7 +655,7 @@ export default Dashboard;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F4FF',
+    backgroundColor: '#F5F5F5',
   },
   headerMain: {
     flexDirection: 'row',
@@ -663,7 +667,7 @@ const styles = StyleSheet.create({
   containerScroll: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#F0F4FF',
+    backgroundColor: '#F5F5F5',
     paddingTop: h(-1),
     marginTop: h(2),
   },

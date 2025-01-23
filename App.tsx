@@ -9,8 +9,7 @@ import BuatAkun from './src/screens/crud/BuatAkun';
 import Dashboard from './src/screens/Dashboard';
 import TambahJadwal from './src/screens/crud/TambahJadwal';
 import EditJadwal from './src/screens/crud/EditJadwal';
-import ModalPesan from './src/screens/notifikasi/ModalPesan';
-import Notifikasi from './src/screens/notifikasi/Notifikasi';
+import TambahTugas from './src/screens/crud/TambahTugas';
 import {
   getDatabase,
   buatAkun,
@@ -48,6 +47,7 @@ const App = () => {
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="TambahJadwal" component={TambahJadwal} />
           <Stack.Screen name="EditJadwal" component={EditJadwal} />
+          <Stack.Screen name="TambahTugas" component={TambahTugas} />
           {/* <Stack.Screen
             name="ModalPesan"
             component={ModalPesan}

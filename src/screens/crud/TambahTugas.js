@@ -14,22 +14,17 @@ import {
   widthPercentageToDP as w,
 } from '../../utils/responsive';
 import {StatusBar} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
 import {insertJadwalKuliah} from '../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TambahJadwal = () => {
+const TambahTugas = () => {
   const [namaMataKuliah, setNamaMataKuliah] = useState('');
-  const [semester, setSemester] = useState('');
-  const [hari, setHari] = useState('');
+  const [namaTugas, setNamaTugas] = useState('');
   const [kelas, setKelas] = useState('');
-  const [ruangan, setRuangan] = useState('');
-  const [jamMulai, setJamMulai] = useState('');
-  const [jamSelesai, setJamSelesai] = useState('');
-  const [tipeJadwal, setTipeJadwal] = useState('');
-  const [aktifkan, setAktifkan] = useState(false);
+  const [tanggal, setTanggal] = useState('');
+  const [pukul, setPukul] = useState('');
   const [idUser, setIdUser] = useState('');
 
   const navigation = useNavigation();
@@ -61,29 +56,15 @@ const TambahJadwal = () => {
 
   const handleSubmission = async () => {
     console.log(idUser);
-    if (
-      idUser &&
-      namaMataKuliah &&
-      semester &&
-      hari &&
-      kelas &&
-      ruangan &&
-      jamMulai &&
-      jamSelesai &&
-      tipeJadwal
-    ) {
+    if (idUser && namaMataKuliah && namaTugas && tanggal && kelas && pukul) {
       try {
         await insertJadwalKuliah(
           idUser,
           namaMataKuliah,
-          semester,
-          hari,
+          namaTugas,
+          tanggal,
           kelas,
-          ruangan,
-          jamMulai,
-          jamSelesai,
-          tipeJadwal,
-          aktifkan,
+          pukul,
         );
         Alert.alert('INFO', 'Berhasil Menambah Data Jadwal', [
           {text: 'OKE', onPress: () => navigasi()},
@@ -106,33 +87,19 @@ const TambahJadwal = () => {
         label: 'Nama Mata Kuliah',
         placeholder: 'Masukkan Nama Mata Kuliah',
       },
+      {label: 'Nama Tugas', placeholder: 'Masukkan Nama Tugas'},
       {
-        label: 'Semester',
-        placeholder: '--- Pilih Semester ---',
-      },
-      {
-        label: 'Hari',
-        placeholder: '--- Pilih Hari ---',
+        label: 'Tanggal',
+        placeholder: '--- Pilih Tanggal ---',
       },
       {
         label: 'Kelas',
         placeholder: 'Masukkan Nama Kelas',
       },
+
       {
-        label: 'Ruangan',
-        placeholder: 'Masukkan Ruangan',
-      },
-      {
-        label: 'Jam Mulai',
-        placeholder: 'Masukkan Jam Mulai',
-      },
-      {
-        label: 'Jam Selesai',
-        placeholder: 'Masukkan Jam Selesai',
-      },
-      {
-        label: 'Tipe Jadwal',
-        placeholder: '--- Pilih Tipe Jadwal ---',
+        label: 'Pukul',
+        placeholder: '---Pilih Jam---',
       },
     ];
 
@@ -142,53 +109,19 @@ const TambahJadwal = () => {
   };
   const inputView = (label, placeholder, key) => {
     let content;
-    if (label == 'Hari') {
-      content = (
-        <Picker
-          selectedValue={hari}
-          style={styles.picker}
-          onValueChange={itemValue => setHari(itemValue)}>
-          <Picker label="--Pilih Hari--" value="" style={{color: 'black'}} />
-          <Picker.Item label="Senin" value="Senin" style={{color: 'black'}} />
-          <Picker.Item label="Selasa" value="Selasa" style={{color: 'black'}} />
-          <Picker.Item label="Rabu" value="Rabu" style={{color: 'black'}} />
-          <Picker.Item label="Kamis" value="Kamis" style={{color: 'black'}} />
-          <Picker.Item label="Jumat" value="Jumat" style={{color: 'black'}} />
-          <Picker.Item label="Sabtu" value="Sabtu" style={{color: 'black'}} />
-        </Picker>
-      );
-    } else if (label == 'Tipe Jadwal' || label == 'Semester') {
-      let data = [];
-      if (label == 'Semester') {
-        data = [1, 2, 3, 4, 5, 6, 7];
-      } else {
-        data = ['Utama', 'Tambahan'];
-      }
-
-      content = (
-        <Picker
-          selectedValue={label == 'Semester' ? semester : tipeJadwal}
-          style={styles.picker}
-          onValueChange={itemValue =>
-            label == 'Semester'
-              ? setSemester(itemValue)
-              : setTipeJadwal(itemValue)
-          }>
-          <Picker.Item label={placeholder} value="" style={{color: 'black'}} />
-          {data.map((value, key) => (
-            <Picker.Item
-              key={key}
-              label={value}
-              value={value}
-              style={{color: 'black'}}
-            />
-          ))}
-        </Picker>
-      );
-    } else if (label == 'Jam Mulai' || label == 'Jam Selesai') {
+    if (label == 'Pukul') {
       content = (
         <TextInput
-          value={label == 'Jam Mulai' ? jamMulai : jamSelesai}
+          placeholderTextColor={'black'}
+          placeholder={placeholder}
+          keyboardType="default"
+          style={styles.textInput}
+          onPress={() => validasiDate(label)}
+        />
+      );
+    } else if (label == 'Tanggal') {
+      content = (
+        <TextInput
           placeholder={placeholder}
           placeholderTextColor={'black'}
           keyboardType="default"
@@ -238,13 +171,13 @@ const TambahJadwal = () => {
   // TIPE Inputan Jadwal
   const validasiDate = label => {
     DateTimePickerAndroid.open({
-      mode: 'time',
+      mode: label == 'Tanggal' ? 'date' : 'time',
       value: new Date(),
       onChange: (event, selectedTime) => {
         if (selectedTime) {
-          label == 'Jam Mulai'
-            ? setJamMulai(formatTime(selectedTime))
-            : setJamSelesai(formatTime(selectedTime));
+          label == 'Pukul'
+            ? setPukul(formatTime(selectedTime))
+            : setTanggal(selectedTime);
         }
       },
     });
@@ -262,10 +195,10 @@ const TambahJadwal = () => {
   const validasiInput = (value, label) => {
     if (label == 'Nama Mata Kuliah') {
       setNamaMataKuliah(value);
+    } else if (label == 'Nama Tugas') {
+      setNamaTugas(value);
     } else if (label == 'Kelas') {
       setKelas(value);
-    } else if (label == 'Ruangan') {
-      setRuangan(value);
     }
   };
 
@@ -294,7 +227,7 @@ const TambahJadwal = () => {
               marginTop: h(3),
               marginBottom: h(1.5),
             }}>
-            Buat Jadwal Mengajar
+            Buat Jadwal Tugas
           </Text>
           {input()}
 
@@ -330,7 +263,7 @@ const TambahJadwal = () => {
   );
 };
 
-export default TambahJadwal;
+export default TambahTugas;
 
 const styles = StyleSheet.create({
   container: {
