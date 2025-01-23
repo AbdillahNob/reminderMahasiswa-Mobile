@@ -61,8 +61,8 @@ export const buatJadwalKuliah = async () => {
     const db = await getDatabase(); //Tunggu getDatabase smpi database selesai dihubungkan
     await db.transaction(tx => {
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS tbKuliah (
-                idMengajar INTEGER PRIMARY KEY AUTOINCREMENT,
+        `CREATE TABLE IF NOT EXISTS tbJadwalKuliah (
+                idKuliah INTEGER PRIMARY KEY AUTOINCREMENT,
                 idUser INTEGER,
                 namaMatkul TEXT,
                 semester TEXT,
@@ -73,6 +73,43 @@ export const buatJadwalKuliah = async () => {
                 jamSelesai TEXT,
                 tipeJadwal TEXT,
                 aktifkan BOOLEAN DEFAULT 0,
+                FOREIGN KEY (idUser) REFERENCES tbAkun (idUser) ON DELETE CASCADE
+              );`,
+        [],
+        (tx, results) => {
+          console.log('Berhasil membuat tabel Jadwal :', results);
+        },
+        (tx, error) => {
+          console.log('Gagal membuat tabel Jadwal :', error);
+        },
+      );
+    });
+  } catch (error) {
+    console.log(
+      'Error saat inisialiasi database, tampilkan errornya : ',
+      error,
+    );
+    throw error;
+  }
+  // console.log(data);
+};
+
+// Buat Tabel Jadwal TUGAS
+export const buatJadwalTugas = async () => {
+  try {
+    const db = await getDatabase(); //Tunggu getDatabase smpi database selesai dihubungkan
+    await db.transaction(tx => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS tbTugas (
+                idTugas INTEGER PRIMARY KEY AUTOINCREMENT,
+                idUser INTEGER,
+                namaMatkul TEXT,
+                namaTugas TEXT,
+                tanggal TEXT,
+                kelas TEXT,
+                pukul TEXT,                
+                kumpul BOOLEAN DEFAULT 0,
+                aktifkan BOOLEAN DEFAULT 0,                
                 FOREIGN KEY (idUser) REFERENCES tbAkun (idUser) ON DELETE CASCADE
               );`,
         [],
@@ -141,7 +178,7 @@ export const insertJadwalKuliah = async (
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `INSERT INTO tbKuliah (idUser, namaMatkul, semester, hari, kelas, ruangan, jamMulai, jamSelesai, tipeJadwal, aktifkan) VALUES (?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO tbJadwalKuliah (idUser, namaMatkul, semester, hari, kelas, ruangan, jamMulai, jamSelesai, tipeJadwal, aktifkan) VALUES (?,?,?,?,?,?,?,?,?,?);`,
         [
           idUser,
           namaMatkul,
@@ -241,21 +278,23 @@ export const getJadwalKuliah = async idUser => {
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
-          `SELECT * FROM tbKuliah WHERE idUser = ?`,
+          `SELECT * FROM tbJadwalKuliah WHERE idUser = ?`,
           [idUser],
           (tx, results) => {
             const rows = results.rows.raw();
             console.log('Jumlah Data Jadwal Mengajar : ', rows.length);
-            // rows.map(data => {
-            //   console.log(
-            //     `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.idMengajar}`,
-            //   );
-            // });
+            rows.map(data => {
+              console.log(
+                `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
+              );
+            });
 
             resolve(rows);
           },
           (tx, error) => {
-            console.log(`Error membaca data dari tabel tbKuliah : ${error}`);
+            console.log(
+              `Error membaca data dari tabel tbJadwalKuliah : ${error}`,
+            );
             reject(error);
           },
         );
@@ -269,7 +308,7 @@ export const getJadwalKuliah = async idUser => {
 
 // Update Jadwal
 export const updateJadwalKuliah = async (
-  idMengajar,
+  idKuliah,
   namaMatkul,
   semester,
   hari,
@@ -283,7 +322,7 @@ export const updateJadwalKuliah = async (
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `UPDATE tbKuliah SET namaMatkul = ?, semester = ?, hari = ?, kelas = ?, ruangan = ?, jamMulai = ?, jamSelesai = ?, tipeJadwal = ? WHERE idMengajar = ?`,
+        `UPDATE tbJadwalKuliah SET namaMatkul = ?, semester = ?, hari = ?, kelas = ?, ruangan = ?, jamMulai = ?, jamSelesai = ?, tipeJadwal = ? WHERE idKuliah = ?`,
         [
           namaMatkul,
           semester,
@@ -293,7 +332,7 @@ export const updateJadwalKuliah = async (
           jamMulai,
           jamSelesai,
           tipeJadwal,
-          idMengajar,
+          idKuliah,
         ],
         (tx, results) => {
           if (results.rowsAffected > 0) {
@@ -314,13 +353,13 @@ export const updateJadwalKuliah = async (
 };
 
 // Update
-export const updateAktifKuliah = async (idMengajar, aktifkan) => {
+export const updateAktifKuliah = async (idKuliah, aktifkan) => {
   try {
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `UPDATE tbKuliah SET aktifkan = ? WHERE idMengajar = ?`,
-        [aktifkan ? 1 : 0, idMengajar],
+        `UPDATE tbJadwalKuliah SET aktifkan = ? WHERE idKuliah = ?`,
+        [aktifkan ? 1 : 0, idKuliah],
         (tx, results) => {
           console.log(`DEBUG Berhasil Edit Aktivasi Alarm : ${results}`);
         },
@@ -339,7 +378,7 @@ export const hapusDataKuliah = async id => {
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `DELETE FROM tbKuliah WHERE idMengajar = ?;`,
+        `DELETE FROM tbJadwalKuliah WHERE idKuliah = ?;`,
         [id],
         (tx, results) => {
           if (results.rowsAffected > 0) {
@@ -385,7 +424,7 @@ export const cekTabel = async () => {
   const db = await getDatabase();
   db.transaction(tx => {
     tx.executeSql(
-      `PRAGMA table_info(tbKuliah);`,
+      `PRAGMA table_info(tbJadwalKuliah);`,
       [],
       (tx, results) => {
         const rows = results.rows.raw();
@@ -407,7 +446,7 @@ export const hapusTabel = async () => {
   const db = await openDb();
   db.transaction(tx => {
     tx.executeSql(
-      `DROP TABLE IF EXISTS tbKuliah`,
+      `DROP TABLE IF EXISTS tbJadwalKuliah`,
       [],
       (tx, results) => {
         console.log('Berhasil Hapus Tabel');

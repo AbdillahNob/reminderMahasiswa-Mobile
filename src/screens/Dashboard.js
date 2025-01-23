@@ -197,15 +197,15 @@ const Dashboard = () => {
   };
 
   const buttonModal = item => {
-    const deleteData = async ({idMengajar, namaMatkul, idUser}) => {
+    const deleteData = async ({idKuliah, namaMatkul, idUser}) => {
       Alert.alert('INFO', 'Apakah Anda yakin ingin Hapus', [
         {text: 'Batal', style: 'Cancel'},
         {
           text: 'Hapus',
           onPress: async () => {
             try {
-              if (idMengajar) {
-                await hapusDataKuliah(idMengajar);
+              if (idKuliah) {
+                await hapusDataKuliah(idKuliah);
 
                 Alert.alert(
                   'INFO',
@@ -221,7 +221,7 @@ const Dashboard = () => {
               } else {
                 Alert.alert(
                   'INFO',
-                  `idMengajar tidak ditemukan : ${data.idMengajar}`,
+                  `idKuliah tidak ditemukan : ${data.idKuliah}`,
                 );
               }
             } catch (error) {
@@ -282,10 +282,10 @@ const Dashboard = () => {
 
   const aturAktif = async id => {
     let jadwalBaru = dataJadwal.map(item =>
-      item.idMengajar === id ? {...item, aktifkan: !item.aktifkan} : item,
+      item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
     );
     setDataJadwal(jadwalBaru);
-    const itemToUpdate = jadwalBaru.find(item => item.idMengajar === id);
+    const itemToUpdate = jadwalBaru.find(item => item.idKuliah === id);
     // console.log(itemToUpdate);
 
     try {
@@ -303,7 +303,7 @@ const Dashboard = () => {
       // If update fails, revert the local state
       setDataJadwal(
         dataJadwal.map(item =>
-          item.idMengajar === id ? {...item, aktifkan: !item.aktifkan} : item,
+          item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
         ),
       );
 
@@ -441,7 +441,7 @@ const Dashboard = () => {
                       trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
                       thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
                       ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
-                      onValueChange={() => aturAktif(item.idMengajar)} // Fungsi saat switch berubah
+                      onValueChange={() => aturAktif(item.idKuliah)} // Fungsi saat switch berubah
                       value={item.aktifkan ? true : false} // Nilai switch (true/false)
                     />
                   </View>
@@ -553,7 +553,7 @@ const Dashboard = () => {
                           trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
                           thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
                           ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
-                          onValueChange={() => aturAktif(item.idMengajar)} // Fungsi saat switch berubah
+                          onValueChange={() => aturAktif(item.idKuliah)} // Fungsi saat switch berubah
                           value={item.aktifkan ? true : false} // Nilai switch (true/false)
                         />
                       </View>

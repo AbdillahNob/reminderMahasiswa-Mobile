@@ -44,7 +44,7 @@ const EditJadwal = () => {
 
     try {
       await updateJadwalKuliah(
-        dataMatkul.idMengajar,
+        dataMatkul.idKuliah,
         updateNamaMatkul,
         updateSemester,
         updateHari,

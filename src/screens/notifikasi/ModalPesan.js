@@ -93,7 +93,7 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
       return (
         <TouchableOpacity
           style={styles.buttonModal}
-          onPress={() => closeModal()}>
+          onPress={() => setModalVisible(false)}>
           <Text style={styles.buttonModalText}>
             Oke terima telah diingatkan
           </Text>
@@ -102,28 +102,36 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
     } else {
       if (keterangan === 'sekarang') {
         const data = [
-          {value: 'Tugas ini telah saya kerjakan'},
+          {value: 'Tugas ini telah saya kumpulkan'},
           {value: 'Tugas ini tidak saya kumpul'},
         ];
         return data.map(({value}, key) => (
           <View key={key}>
             <TouchableOpacity
               style={styles.buttonModal}
-              onPress={() => setModalVisible(false)}>
+              onPress={() =>
+                value == 'Tugas ini telah saya kumpulkan'
+                  ? cekListTugas()
+                  : setModalVisible(false)
+              }>
               <Text style={styles.buttonModalText}>{value}</Text>
             </TouchableOpacity>
           </View>
         ));
       } else if (keterangan == 'sebelum 15') {
         const data = [
-          {value: 'Tugas ini telah saya kerjakan'},
+          {value: 'Tugas ini telah saya kumpulkan'},
           {value: 'Tugas ini sedang saya kerja'},
         ];
         return data.map(({value}, key) => (
           <View key={key}>
             <TouchableOpacity
               style={styles.buttonModal}
-              onPress={() => setModalVisible(false)}>
+              onPress={() =>
+                value == 'Tugas ini telah saya kumpulkan'
+                  ? cekListTugas()
+                  : setModalVisible(false)
+              }>
               <Text style={styles.buttonModalText}>{value}</Text>
             </TouchableOpacity>
           </View>
@@ -136,6 +144,8 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
     setModalVisible(false);
     // setModalVisibleDetail(false);
   };
+
+  const cekListTugas = () => {};
 
   // const openModalDetail = () => {
   //   setModalVisible(false);
