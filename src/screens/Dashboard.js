@@ -9,6 +9,7 @@ import {
   Switch,
   Modal,
   Alert,
+  FlatList,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -28,11 +29,17 @@ import Notifikasi from './notifikasi/Notifikasi';
 
 const Dashboard = () => {
   const navigasi = useNavigation();
+  const [kategori, setKategori] = useState({title: 'kuliah'});
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [dataJadwal, setDataJadwal] = useState([]);
   const [idUser, setIdUser] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [subMenu, setSubMenu] = useState([
+    {title: 'kuliah'},
+    {title: 'tugas'},
+    {title: 'history'},
+  ]);
 
   useEffect(() => {
     // console.log(jadwal);
@@ -78,41 +85,100 @@ const Dashboard = () => {
 
   const headerMainView = () => {
     return (
-      <View style={styles.headerMain}>
-        <Text
+      <View style={{backgroundColor: '#F0F4FF'}}>
+        <View
           style={{
-            color: 'black',
-            fontSize: w(4.5),
-            fontWeight: 'bold',
-            marginLeft: w(5),
-          }}>
-          Jadwal kuliah Anda{' '}
-        </Text>
-        <Image
-          source={require('../assets/icons/book.png')}
-          style={{width: w(6), height: h(3), marginLeft: w(-26)}}
-          resizeMode={'cover'}
-        />
-        <TouchableOpacity
-          style={{
-            width: w(8),
-            height: h(4),
-            backgroundColor: '#0F4473',
-            elevation: 3,
-            borderRadius: w(5),
-            marginRight: w(6),
-            opacity: 0.85,
-            marginTop: h(-0.6),
+            marginTop: h(2),
             justifyContent: 'center',
             alignItems: 'center',
-          }}
-          onPress={() => navigasi.navigate('TambahJadwal')}>
-          <Image
-            source={require('../assets/icons/plus.png')}
-            resizeMode={'center'}
-            style={{width: w(5), height: h(2.5)}}
+          }}>
+          <FlatList
+            data={subMenu}
+            style={{
+              paddingTop: h(0.5),
+              paddingBottom: h(0.8),
+              marginBottom: h(-0.3),
+            }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                style={{
+                  backgroundColor:
+                    kategori.title == item.title ? '#2A2A2A' : '#ffffff',
+                  opacity: kategori.title == item.title ? 0.85 : 1,
+                  marginHorizontal: w(5),
+                  paddingRight: w(4.2),
+                  paddingLeft: w(4.2),
+                  paddingTop: h(0.8),
+                  paddingBottom: h(0.8),
+                  borderRadius: w(3),
+                  elevation: 2,
+                }}
+                onPress={() => setKategori(item)}>
+                <Text
+                  style={{
+                    textTransform: 'capitalize',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: w(4.2),
+                    color: kategori.title == item.title ? '#ffffff' : 'black',
+                  }}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            )}
           />
-        </TouchableOpacity>
+        </View>
+        <View style={styles.headerMain}>
+          <Text
+            style={{
+              color: 'black',
+              fontSize: w(4.5),
+              fontWeight: 'bold',
+              marginLeft: w(5),
+              textTransform: 'capitalize',
+            }}>
+            Jadwal{' '}
+            {kategori.title !== 'history' ? kategori.title : 'history tugas'}{' '}
+            Anda{' '}
+          </Text>
+          {kategori.title !== 'history' ? (
+            <Image
+              source={require('../assets/icons/book.png')}
+              style={{width: w(6), height: h(3), marginLeft: w(-26)}}
+              resizeMode={'cover'}
+            />
+          ) : (
+            <Image
+              source={require('../assets/icons/book.png')}
+              style={{width: w(6), height: h(3), marginRight: w(26)}}
+              resizeMode={'cover'}
+            />
+          )}
+          {kategori.title == 'history' ? null : (
+            <TouchableOpacity
+              style={{
+                width: w(8),
+                height: h(4),
+                backgroundColor: '#2A2A2A',
+                elevation: 3,
+                borderRadius: w(5),
+                marginRight: w(6),
+                opacity: 0.85,
+                marginTop: h(-0.6),
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => navigasi.navigate('TambahJadwal')}>
+              <Image
+                source={require('../assets/icons/plus.png')}
+                resizeMode={'center'}
+                style={{width: w(5), height: h(2.5)}}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   };
@@ -231,137 +297,300 @@ const Dashboard = () => {
     <View style={styles.container}>
       <Notifikasi refreshTrigger={refreshTrigger} />
       <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
+      {/* Agar setiap perubahan baik edit dan hapus lngsng terefresh data yg tampil di HEADER */}
       {idUser || dataJadwal.length > 0 ? (
         <HeaderDashboard idUser={idUser} dataJadwal={dataJadwal} />
       ) : null}
       {headerMainView()}
       <SafeAreaView style={styles.containerScroll}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingLeft: w(2),
-            paddingRight: w(2),
-          }}>
-          {dataJadwal.map((item, key) => (
-            <View key={key} style={styles.card}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
-                  marginTop: h(1.1),
-                  paddingHorizontal: w(2.2),
-                }}>
+        {kategori.title === 'kuliah' ? (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{
+              paddingLeft: w(2),
+              paddingRight: w(2),
+            }}>
+            {dataJadwal.map((item, key) => (
+              <View key={key} style={styles.card}>
                 <View
                   style={{
-                    flexDirection: 'column',
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    marginTop: h(1.1),
+                    paddingHorizontal: w(2.2),
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                    }}>
+                    <Text
+                      style={{
+                        width: w(65),
+                        fontSize: w(4),
+                        fontWeight: 'bold',
+                        textTransform: 'capitalize',
+                      }}>
+                      {item.namaMatkul}
+                    </Text>
+                    <View
+                      style={{
+                        width: w(28),
+                        height: h(0.1),
+                        backgroundColor: '#0F4473',
+                        borderRadius: w(3),
+                        marginTop: h(0.6),
+                      }}
+                    />
+
+                    <Text style={styles.textDescCard}>
+                      kelas{' '}
+                      <Text
+                        style={{
+                          color:
+                            item.tipeJadwal == 'Utama' ? '#E8304E' : '#0F4473',
+                        }}>
+                        {item.tipeJadwal}
+                      </Text>
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={{marginTop: h(1)}}
+                    onPress={() => openModal(item)}>
+                    <Image
+                      source={require('../assets/icons/settings.png')}
+                      style={{width: w(8), height: h(3.6)}}
+                      resizeMode={'center'}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: w(6),
+                    marginRight: w(6),
+                    justifyContent: 'space-around',
+                    marginTop: h(1.5),
+                  }}>
+                  <View style={{alignItems: 'center'}}>
+                    <Text style={styles.textDescCard}>{item.hari}</Text>
+                    <Text style={styles.textDescCard}>Hari</Text>
+                  </View>
+                  <View style={{alignItems: 'center'}}>
+                    <Text style={styles.textDescCard2}>{item.kelas}</Text>
+                    <Text style={styles.textDescCard}>Kelas</Text>
+                  </View>
+                  <View style={{alignItems: 'center'}}>
+                    <Text style={styles.textDescCard2}>{item.ruangan}</Text>
+                    <Text style={styles.textDescCard}>Ruangan</Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginTop: h(1.5),
+                    justifyContent: 'space-between',
                   }}>
                   <Text
                     style={{
-                      width: w(65),
-                      fontSize: w(4),
-                      fontWeight: 'bold',
+                      color: 'black',
+                      opacity: 0.7,
+                      fontSize: w(3.8),
                       textTransform: 'capitalize',
+                      marginLeft: w(6.5),
+                      marginTop: w(4),
+                      fontWeight: '500',
                     }}>
-                    {item.namaMatkul}
+                    Jadwal: {item.jamMulai} - {item.jamSelesai} wita
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      marginRight: w(1),
+                    }}>
+                    <Text
+                      style={{
+                        color: item.aktifkan ? '#00B038' : '#E8304E',
+                        paddingRight: w(2),
+                      }}>
+                      {item.aktifkan ? 'Aktif' : 'Tidak Aktif'}
+                    </Text>
+
+                    <Switch
+                      trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
+                      thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
+                      ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
+                      onValueChange={() => aturAktif(item.idMengajar)} // Fungsi saat switch berubah
+                      value={item.aktifkan ? true : false} // Nilai switch (true/false)
+                    />
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{
+              paddingLeft: w(2),
+              paddingRight: w(2),
+            }}>
+            {dataJadwal.map((item, key) => (
+              <View key={key} style={styles.card}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    marginTop: h(1.1),
+                    paddingHorizontal: w(2.2),
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                    }}>
+                    <Text
+                      style={{
+                        width: w(65),
+                        fontSize: w(4),
+                        fontWeight: 'bold',
+                        textTransform: 'capitalize',
+                      }}>
+                      {item.namaMatkul}a
+                    </Text>
+                    <View
+                      style={{
+                        width: w(28),
+                        height: h(0.1),
+                        backgroundColor: '#0F4473',
+                        borderRadius: w(3),
+                        marginTop: h(0.6),
+                      }}
+                    />
+                    <Text
+                      style={{
+                        marginTop: h(0.6),
+                        textTransform: 'capitalize',
+                        color: 'black',
+                        fontWeight: '500',
+                        width: w(60),
+                      }}>
+                      PROGRAM
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={{marginTop: h(1)}}
+                    onPress={() => openModal(item)}>
+                    <Image
+                      source={require('../assets/icons/settings.png')}
+                      style={{width: w(8), height: h(3.6)}}
+                      resizeMode={'center'}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    marginLeft: w(4.5),
+                    alignItems: 'flex-start',
+                  }}>
+                  <Text style={styles.textDescCardTugas}>
+                    Hari/Tgl : {item.hari} 20 Februari 2024
+                  </Text>
+                  <Text style={styles.textDescCardTugas}>
+                    Kelas : {item.kelas}
                   </Text>
                   <View
                     style={{
-                      width: w(28),
-                      height: h(0.1),
-                      backgroundColor: '#0F4473',
-                      borderRadius: w(3),
-                      marginTop: h(0.6),
-                    }}
-                  />
-
-                  <Text style={styles.textDescCard}>
-                    kelas{' '}
-                    <Text
-                      style={{
-                        color:
-                          item.tipeJadwal == 'Utama' ? '#E8304E' : '#0F4473',
-                      }}>
-                      {item.tipeJadwal}
+                      flexDirection: 'row',
+                      marginBottom: h(1.5),
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text style={styles.textDescCardTugas}>
+                      Pukul : {item.ruangan}
                     </Text>
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={{marginTop: h(1)}}
-                  onPress={() => openModal(item)}>
-                  <Image
-                    source={require('../assets/icons/settings.png')}
-                    style={{width: w(8), height: h(3.6)}}
-                    resizeMode={'center'}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: w(6),
-                  marginRight: w(6),
-                  justifyContent: 'space-around',
-                  marginTop: h(1.5),
-                }}>
-                <View style={{alignItems: 'center'}}>
-                  <Text style={styles.textDescCard}>{item.hari}</Text>
-                  <Text style={styles.textDescCard}>Hari</Text>
-                </View>
-                <View style={{alignItems: 'center'}}>
-                  <Text style={styles.textDescCard2}>{item.kelas}</Text>
-                  <Text style={styles.textDescCard}>Kelas</Text>
-                </View>
-                <View style={{alignItems: 'center'}}>
-                  <Text style={styles.textDescCard2}>{item.ruangan}</Text>
-                  <Text style={styles.textDescCard}>Ruangan</Text>
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginTop: h(1.5),
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: 'black',
-                    opacity: 0.7,
-                    fontSize: w(3.8),
-                    textTransform: 'capitalize',
-                    marginLeft: w(6.5),
-                    marginTop: w(4),
-                    fontWeight: '500',
-                  }}>
-                  Jadwal: {item.jamMulai} - {item.jamSelesai} wita
-                </Text>
 
+                    {kategori.title == 'tugas' ? (
+                      <View
+                        style={{
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          marginLeft: item.aktifkan ? w(4) : w(-3),
+                        }}>
+                        <Text
+                          style={{
+                            color: item.aktifkan ? '#00B038' : '#E8304E',
+                            textAlign: 'center',
+                            paddingRight: w(2),
+                            fontSize: w(3.5),
+                          }}>
+                          {item.aktifkan ? 'Aktif' : 'Tidak Aktif'}
+                        </Text>
+
+                        <Switch
+                          trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
+                          thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
+                          ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
+                          onValueChange={() => aturAktif(item.idMengajar)} // Fungsi saat switch berubah
+                          value={item.aktifkan ? true : false} // Nilai switch (true/false)
+                        />
+                      </View>
+                    ) : (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          marginLeft: item.aktifkan ? w(-2) : w(-10),
+                        }}>
+                        <Text
+                          style={{
+                            color: item.aktifkan ? '#00B038' : '#E8304E',
+                            textAlign: 'center',
+                            textTransform: 'capitalize',
+                            fontSize: w(3.5),
+                          }}>
+                          {item.aktifkan ? 'terkumpul' : 'belum dikumpul'}
+                        </Text>
+                        <View
+                          style={{
+                            width: w(5),
+                            height: h(2.5),
+                            borderRadius: w(3),
+                            borderColor: 'black',
+                            borderWidth: 2,
+                            marginTop: h(0.5),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          {item.aktifkan ? (
+                            <Image
+                              source={require('../assets/icons/check.png')}
+                              resizeMode={'center'}
+                              style={{width: w(4.2), height: h(3)}}
+                            />
+                          ) : (
+                            <Image
+                              source={require('../assets/icons/question.png')}
+                              resizeMode={'center'}
+                              style={{width: w(4.2), height: h(3)}}
+                            />
+                          )}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                </View>
                 <View
                   style={{
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    marginRight: w(1),
-                  }}>
-                  <Text
-                    style={{
-                      color: item.aktifkan ? '#00B038' : '#E8304E',
-                      paddingRight: w(2),
-                    }}>
-                    {item.aktifkan ? 'Aktif' : 'Tidak Aktif'}
-                  </Text>
-
-                  <Switch
-                    trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
-                    thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
-                    ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
-                    onValueChange={() => aturAktif(item.idMengajar)} // Fungsi saat switch berubah
-                    value={item.aktifkan ? true : false} // Nilai switch (true/false)
-                  />
-                </View>
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    justifyContent: 'flex-end',
+                    marginTop: h(-2),
+                  }}></View>
               </View>
-            </View>
-          ))}
-        </ScrollView>
+            ))}
+          </ScrollView>
+        )}
       </SafeAreaView>
       {/* MODAL */}
       {selectedItem && (
@@ -427,6 +656,8 @@ const styles = StyleSheet.create({
   headerMain: {
     flexDirection: 'row',
     marginTop: h(3),
+    marginLeft: w(1.3),
+    marginRight: w(1.3),
     justifyContent: 'space-between',
   },
   containerScroll: {
@@ -461,6 +692,15 @@ const styles = StyleSheet.create({
     fontSize: w(4),
     textTransform: 'uppercase',
     textAlign: 'center',
+  },
+  textDescCardTugas: {
+    paddingTop: h(0.6),
+    color: 'black',
+    opacity: 1,
+    fontWeight: '450',
+    fontSize: w(3.8),
+    textTransform: 'capitalize',
+    width: w(65),
   },
   modalContainer: {
     flex: 1,
