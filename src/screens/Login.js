@@ -98,7 +98,7 @@ const Login = () => {
       const db = await getDatabase();
       await db.transaction(tx => {
         tx.executeSql(
-          `SELECT * FROM AkunUser WHERE username = ? AND password = ?`,
+          `SELECT * FROM tbAkun WHERE username = ? AND password = ?`,
           [username, password],
           async (tx, results) => {
             const user = results.rows.raw();
@@ -186,7 +186,7 @@ const Login = () => {
                   fontSize: w(6),
                   textTransform: 'uppercase',
                 }}>
-                buat
+                login
               </Text>
             </TouchableOpacity>
           </View>

@@ -28,20 +28,20 @@ export const buatAkun = async () => {
     const db = await getDatabase(); //Tunggu getDatabase smpi database selesai dihubungkan
     await db.transaction(tx => {
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS AkunUser (
+        `CREATE TABLE IF NOT EXISTS tbAkun (
                 idUser INTEGER PRIMARY KEY AUTOINCREMENT,
                 namaLengkap TEXT,
-                nidn TEXT,
+                nim TEXT,
                 namaPerguruan TEXT,
                 username TEXT,
                 password TEXT
               );`,
         [],
         (tx, results) => {
-          console.log('Berhasil membuat tabel AkunUser :', results);
+          console.log('Berhasil membuat tabel tbAkun :', results);
         },
         (tx, error) => {
-          console.log('Gagal membuat tabel AkunUser :', error);
+          console.log('Gagal membuat tabel tbAkun :', error);
         },
       );
     });
@@ -73,7 +73,7 @@ export const buatJadwal = async () => {
                 jamSelesai TEXT,
                 tipeJadwal TEXT,
                 aktifkan BOOLEAN DEFAULT 0,
-                FOREIGN KEY (idUser) REFERENCES AkunUser (idUser) ON DELETE CASCADE
+                FOREIGN KEY (idUser) REFERENCES tbAkun (idUser) ON DELETE CASCADE
               );`,
         [],
         (tx, results) => {
@@ -97,7 +97,7 @@ export const buatJadwal = async () => {
 // Create AKUN
 export const insertAkun = async (
   namaLengkap,
-  nidn,
+  nim,
   namaPerguruan,
   username,
   password,
@@ -106,8 +106,8 @@ export const insertAkun = async (
     const db = await getDatabase();
     await db.transaction(tx => {
       tx.executeSql(
-        `INSERT INTO AkunUser (namaLengkap, nidn, namaPerguruan, username, password) VALUES (?,?,?,?,?)`,
-        [namaLengkap, nidn, namaPerguruan, username, password],
+        `INSERT INTO tbAkun (namaLengkap, nim, namaPerguruan, username, password) VALUES (?,?,?,?,?)`,
+        [namaLengkap, nim, namaPerguruan, username, password],
         (tx, results) => {
           if (results.rowsAffected > 0) {
             console.log('Akun berhasil ditambahkan');
@@ -179,13 +179,13 @@ export const getAkun = async () => {
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
-          `SELECT * FROM AkunUser`,
+          `SELECT * FROM tbAkun`,
           [],
           (tx, results) => {
             const rows = results.rows.raw();
-            console.log('Jumlah Data : ', rows.length);
+            console.log('Jumlah Data Akun : ', rows.length);
             rows.map(data => {
-              console.log(`Berhasil tarik Data : ${data.username}`);
+              console.log(`Berhasil tarik Data Akun : ${data.username}`);
             });
 
             resolve(rows);
@@ -210,13 +210,13 @@ export const getAkunDetail = async idUser => {
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
-          `SELECT * FROM AkunUser WHERE idUser = ?`,
+          `SELECT * FROM tbAkun WHERE idUser = ?`,
           [idUser],
           (tx, results) => {
             const rows = results.rows.raw();
-            // console.log('Jumlah Data : ', rows);
+            // console.log('Jumlah Data Akun : ', rows);
             rows.map(data => {
-              // console.log(`Berhasil tarik Data : ${data.username}`);
+              // console.log(`Berhasil tarik Data Akun : ${data.username}`);
             });
 
             resolve(rows);
@@ -409,7 +409,7 @@ export const hapusTabel = async () => {
   const db = await openDb();
   db.transaction(tx => {
     tx.executeSql(
-      `DROP TABLE IF EXISTS AkunUser`,
+      `DROP TABLE IF EXISTS tbAkun`,
       [],
       (tx, results) => {
         console.log('Berhasil Hapus Tabel');

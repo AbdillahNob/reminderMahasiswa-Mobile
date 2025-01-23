@@ -178,7 +178,7 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
               marginLeft: w(3.5),
               textTransform: 'capitalize',
             }}>
-            dosen {dataUser ? dataUser.namaPerguruan : '-'}
+            Mahasiswa {dataUser ? dataUser.namaPerguruan : '-'}
           </Text>
         </View>
         <Image
