@@ -208,11 +208,6 @@ const Notifikasi = ({refreshTrigger}) => {
 
       const alarmTimes = [
         {
-          label: '1 Hari Sebelumnya',
-          time: firstNotificationTime,
-          jenisModal: 'sebelum 1',
-        },
-        {
           label: '15 Menit Sebelumnya',
           time: secondNotificationTime,
           jenisModal: 'sebelum 15',

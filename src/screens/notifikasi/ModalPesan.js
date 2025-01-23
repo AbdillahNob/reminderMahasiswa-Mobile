@@ -19,9 +19,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ModalPesan = ({dataModal, dataModalJenis}) => {
   const [modalVisible, setModalVisible] = useState(true);
-  const [modalVisibleDetail, setModalVisibleDetail] = useState(false);
+  // const [modalVisibleDetail, setModalVisibleDetail] = useState(false);
   const [jenisModal, setJenisModal] = useState(null);
-  const [dataModalDetail, setDataModalDetail] = useState(null);
+  // const [dataModalDetail, setDataModalDetail] = useState(null);
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
@@ -87,124 +87,110 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
 
   const button = ket => {
     let keterangan = ket;
-    if (keterangan === 'sekarang') {
-      const data = [
-        {value: 'Saya Telah Hadir di kelas'},
-        {value: 'Saya Sedang perjalanan ke-Kelas'},
-        {value: 'Berhalangan Hadir'},
-      ];
-      return data.map(({value}, key) => (
-        <View key={key}>
-          <TouchableOpacity
-            style={styles.buttonModal}
-            onPress={() =>
-              value == 'Berhalangan Hadir'
-                ? openModalDetail()
-                : aturSentWa(value)
-            }>
-            <Text style={styles.buttonModalText}>{value}</Text>
-          </TouchableOpacity>
-        </View>
-      ));
-    } else if (keterangan == 'sebelum 15') {
-      const data = [
-        {value: 'Nanti saya hadir di Kelas'},
-        {value: 'Saya Sedang perjalanan Ke-kelas'},
-        {value: 'Berhalangan Hadir'},
-      ];
-      return data.map(({value}, key) => (
-        <View key={key}>
-          <TouchableOpacity
-            style={styles.buttonModal}
-            onPress={() =>
-              value == 'Berhalangan Hadir'
-                ? openModalDetail()
-                : aturSentWa(value)
-            }>
-            <Text style={styles.buttonModalText}>{value}</Text>
-          </TouchableOpacity>
-        </View>
-      ));
+
+    // utk Validasi apakah alarm ini jadwalKuliah atau Tugas
+    if (dataModal.hari) {
+      return (
+        <TouchableOpacity
+          style={styles.buttonModal}
+          onPress={() => closeModal()}>
+          <Text style={styles.buttonModalText}>
+            Oke terima telah diingatkan
+          </Text>
+        </TouchableOpacity>
+      );
     } else {
-      const data = [
-        {value: 'Besok saya hadir di kelas'},
-        {value: 'Berhalangan Hadir'},
-      ];
-      return data.map(({value}, key) => (
-        <View key={key}>
-          <TouchableOpacity
-            style={styles.buttonModal}
-            onPress={() =>
-              value == 'Berhalangan Hadir'
-                ? openModalDetail()
-                : aturSentWa(value)
-            }>
-            <Text style={styles.buttonModalText}>{value}</Text>
-          </TouchableOpacity>
-        </View>
-      ));
+      if (keterangan === 'sekarang') {
+        const data = [
+          {value: 'Tugas ini telah saya kerjakan'},
+          {value: 'Tugas ini tidak saya kumpul'},
+        ];
+        return data.map(({value}, key) => (
+          <View key={key}>
+            <TouchableOpacity
+              style={styles.buttonModal}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonModalText}>{value}</Text>
+            </TouchableOpacity>
+          </View>
+        ));
+      } else if (keterangan == 'sebelum 15') {
+        const data = [
+          {value: 'Tugas ini telah saya kerjakan'},
+          {value: 'Tugas ini sedang saya kerja'},
+        ];
+        return data.map(({value}, key) => (
+          <View key={key}>
+            <TouchableOpacity
+              style={styles.buttonModal}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonModalText}>{value}</Text>
+            </TouchableOpacity>
+          </View>
+        ));
+      }
     }
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setModalVisibleDetail(false);
+    // setModalVisibleDetail(false);
   };
 
-  const openModalDetail = () => {
-    setModalVisible(false);
-    setModalVisibleDetail(true);
-  };
+  // const openModalDetail = () => {
+  //   setModalVisible(false);
+  //   setModalVisibleDetail(true);
+  // };
 
-  const alasanDetail = () => {
-    const data = [
-      {
-        id: 1,
-        value: 'Saya Sedang Sakit, jadi tidak bisa masuk di kelas 1-TALGO-H',
-      },
-      {
-        id: 2,
-        value:
-          'Saya lagi ada kegiatan, jadi tidak bisa masuk di kelas 1-TALGO-H',
-      },
-    ];
-    return data.map(({value, id}, key) => (
-      <View key={key}>
-        <TouchableOpacity value={value} onPress={() => aturSentWa(value)}>
-          <Text
-            style={{
-              width: w('65%'),
-              fontSize: w(4),
-              color: 'black',
-              fontWeight: 'medium',
-            }}>{`${id}. ${value}`}</Text>
-        </TouchableOpacity>
-      </View>
-    ));
-  };
+  // const alasanDetail = () => {
+  //   const data = [
+  //     {
+  //       id: 1,
+  //       value: 'Saya Sedang Sakit, jadi tidak bisa masuk di kelas 1-TALGO-H',
+  //     },
+  //     {
+  //       id: 2,
+  //       value:
+  //         'Saya lagi ada kegiatan, jadi tidak bisa masuk di kelas 1-TALGO-H',
+  //     },
+  //   ];
+  //   return data.map(({value, id}, key) => (
+  //     <View key={key}>
+  //       <TouchableOpacity value={value} onPress={() => aturSentWa(value)}>
+  //         <Text
+  //           style={{
+  //             width: w('65%'),
+  //             fontSize: w(4),
+  //             color: 'black',
+  //             fontWeight: 'medium',
+  //           }}>{`${id}. ${value}`}</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   ));
+  // };
 
-  const sendMessageWa = async message => {
-    setModalVisible(false);
-    setModalVisibleDetail(false);
-    try {
-      SendIntentAndroid.sendText({
-        text: message,
-        type: SendIntentAndroid.TEXT_PLAIN,
-        packageName: 'com.whatsapp',
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const sendMessageWa = async message => {
+  //   setModalVisible(false);
+  //   setModalVisibleDetail(false);
+  //   try {
+  //     SendIntentAndroid.sendText({
+  //       text: message,
+  //       type: SendIntentAndroid.TEXT_PLAIN,
+  //       packageName: 'com.whatsapp',
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-  const aturSentWa = async value => {
-    // const grupKelas = 'https://chat.whatsapp.com/IXKCUISiozMISOtGWpBg6t';
-    // const grupStafFo = 'https://chat.whatsapp.com/LsIa1zJ3JMVBdCeVsKjpyq';
-    const message = value;
+  // const aturSentWa = async value => {
+  //   // const grupKelas = 'https://chat.whatsapp.com/IXKCUISiozMISOtGWpBg6t';
+  //   // const grupStafFo = 'https://chat.whatsapp.com/LsIa1zJ3JMVBdCeVsKjpyq';
+  //   const message = value;
 
-    await sendMessageWa(message);
-    await sendMessageWa(message);
-  };
+  //   await sendMessageWa(message);
+  //   await sendMessageWa(message);
+  // };
 
   return (
     <>
@@ -325,7 +311,7 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
       )}
 
       {/* Modal DETAIL */}
-      {modalVisibleDetail ? (
+      {/* {modalVisibleDetail ? (
         <Modal
           visible={modalVisibleDetail}
           animationType="fade"
@@ -351,7 +337,7 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
             </View>
           </View>
         </Modal>
-      ) : null}
+      ) : null} */}
     </>
   );
 };
