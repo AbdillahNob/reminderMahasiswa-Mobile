@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "827340478627",
+    "project_id": "notifalarmdosen",
+    "storage_bucket": "notifalarmdosen.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827340478627:android:872f9c3e617ec31e978716",
+        "android_client_info": {
+          "package_name": "com.alarmdosen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHtHCL504pGlgCkS0WTSasEOnp1sHMBLs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
