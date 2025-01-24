@@ -367,7 +367,7 @@ export const getJadwalTugas = async idUser => {
             console.log('Jumlah Data Jadwal Tugas : ', rows.length);
             rows.map(data => {
               console.log(
-                `Berhasil tarik Data Jadwal Tugas dengan idTugas : ${data.namaTugas}`,
+                `Berhasil tarik Data Jadwal Tugas dengan idTugas : ${data.aktifkan}`,
               );
             });
 
@@ -452,6 +452,26 @@ export const updateAktifKuliah = async (idKuliah, aktifkan) => {
     });
   } catch (err) {
     console.error('Error updating status:', JSON.stringify(err, null, 2));
+  }
+};
+
+export const updateAktifTugas = async (idTugas, aktifkan) => {
+  try {
+    const db = await getDatabase();
+    await db.transaction(tx => {
+      tx.executeSql(
+        `UPDATE tbJadwalTugas SET aktifkan = ? WHERE idTugas = ?`,
+        [aktifkan ? 1 : 0, idTugas],
+        (tx, results) => {
+          console.log(`DEBUG Berhasil Edit Aktivasi Alarm Tugas : ${results}`);
+        },
+        (tx, error) => {
+          console.log(`Error mengedit aktivasi Alarm Tugas : ${error}`);
+        },
+      );
+    });
+  } catch (err) {
+    console.error('Error updating status Tugas:', JSON.stringify(err, null, 2));
   }
 };
 // Hapus Data

@@ -24,6 +24,7 @@ import {
   hapusDataKuliah,
   updateAktifKuliah,
   getJadwalTugas,
+  updateAktifTugas,
 } from '../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notifikasi from './notifikasi/Notifikasi';
@@ -34,6 +35,7 @@ const Dashboard = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [dataJadwal, setDataJadwal] = useState([]);
+  const [dataTugas, setDataTugas] = useState([]);
   const [idUser, setIdUser] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [subMenu, setSubMenu] = useState([
@@ -79,6 +81,7 @@ const Dashboard = () => {
     try {
       const hasilK = await getJadwalKuliah(idUser);
       const hasilT = await getJadwalTugas(idUser);
+      setDataTugas(hasilT);
       setDataJadwal(hasilK);
     } catch (error) {
       console.log(`Gagal Ambil data Jadwal : ${error}`);
@@ -282,36 +285,66 @@ const Dashboard = () => {
     ));
   };
 
-  const aturAktif = async id => {
-    let jadwalBaru = dataJadwal.map(item =>
-      item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
-    );
-    setDataJadwal(jadwalBaru);
-    const itemToUpdate = jadwalBaru.find(item => item.idKuliah === id);
-    // console.log(itemToUpdate);
-
-    try {
-      await updateAktifKuliah(id, itemToUpdate.aktifkan);
-      Alert.alert(
-        'INFO',
-        `Status Aktivasi Alarm ${
-          itemToUpdate.namaMatkul
-        } berhasil diperbarui menjadi ${
-          itemToUpdate.aktifkan ? 'Aktif' : 'Tidak Aktif'
-        }.`,
+  const aturAktif = async (id, jenisData) => {
+    let itemToUpdate = [];
+    if (jenisData == 'kuliah') {
+      let jadwalBaru = dataJadwal.map(item =>
+        item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
       );
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      // If update fails, revert the local state
-      setDataJadwal(
-        dataJadwal.map(item =>
-          item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
-        ),
-      );
+      setDataJadwal(jadwalBaru);
+      itemToUpdate = jadwalBaru.find(item => item.idKuliah === id);
+      try {
+        await updateAktifKuliah(id, itemToUpdate.aktifkan);
+        Alert.alert(
+          'INFO',
+          `Status Aktivasi Alarm ${
+            itemToUpdate.namaMatkul
+          } berhasil diperbarui menjadi ${
+            itemToUpdate.aktifkan ? 'Aktif' : 'Tidak Aktif'
+          }.`,
+        );
+        setRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        // If update fails, revert the local state
+        setDataJadwal(
+          dataJadwal.map(item =>
+            item.idKuliah === id ? {...item, aktifkan: !item.aktifkan} : item,
+          ),
+        );
 
-      Alert.alert('ERROR', 'Gagal memperbarui status Aktivasi Alarm.');
-      console.error(`Error updating status: ${error}`);
+        Alert.alert('ERROR', 'Gagal memperbarui status Aktivasi Alarm.');
+        console.error(`Error updating status: ${error}`);
+      }
+    } else if (jenisData == 'tugas') {
+      let jadwalBaru = dataTugas.map(item =>
+        item.idTugas === id ? {...item, aktifkan: !item.aktifkan} : item,
+      );
+      setDataTugas(jadwalBaru);
+      itemToUpdate = jadwalBaru.find(item => item.idTugas === id);
+      try {
+        await updateAktifTugas(id, itemToUpdate.aktifkan);
+        Alert.alert(
+          'INFO',
+          `Status Aktivasi Alarm Tugas ${
+            itemToUpdate.namaTugas
+          } berhasil diperbarui menjadi ${
+            itemToUpdate.aktifkan ? 'Aktif' : 'Tidak Aktif'
+          }.`,
+        );
+        setRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        // If update fails, revert the local state
+        setDataTugas(
+          dataTugas.map(item =>
+            item.idTugas === id ? {...item, aktifkan: !item.aktifkan} : item,
+          ),
+        );
+
+        Alert.alert('ERROR', 'Gagal memperbarui status Aktivasi Alarm Tugas.');
+        console.error(`Error updating status Tugas: ${error}`);
+      }
     }
+    // console.log(itemToUpdate);
   };
 
   return (
@@ -443,7 +476,7 @@ const Dashboard = () => {
                       trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
                       thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
                       ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
-                      onValueChange={() => aturAktif(item.idKuliah)} // Fungsi saat switch berubah
+                      onValueChange={() => aturAktif(item.idKuliah, 'kuliah')} // Fungsi saat switch berubah
                       value={item.aktifkan ? true : false} // Nilai switch (true/false)
                     />
                   </View>
@@ -458,7 +491,7 @@ const Dashboard = () => {
               paddingLeft: w(2),
               paddingRight: w(2),
             }}>
-            {dataJadwal.map((item, key) => (
+            {dataTugas.map((item, key) => (
               <View key={key} style={styles.card}>
                 <View
                   style={{
@@ -497,7 +530,7 @@ const Dashboard = () => {
                         fontWeight: '500',
                         width: w(60),
                       }}>
-                      PROGRAM
+                      {item.namaTugas}
                     </Text>
                   </View>
                   {kategori.title == 'tugas' ? (
@@ -517,9 +550,10 @@ const Dashboard = () => {
                     flexDirection: 'column',
                     marginLeft: w(4.5),
                     alignItems: 'flex-start',
+                    marginTop: h(0.5),
                   }}>
                   <Text style={styles.textDescCardTugas}>
-                    Hari/Tgl : {item.hari} 20 Februari 2024
+                    Hari/Tgl : {item.tanggal}
                   </Text>
                   <Text style={styles.textDescCardTugas}>
                     Kelas : {item.kelas}
@@ -531,7 +565,7 @@ const Dashboard = () => {
                       justifyContent: 'space-between',
                     }}>
                     <Text style={styles.textDescCardTugas}>
-                      Pukul : {item.ruangan}
+                      Pukul : {item.pukul}
                     </Text>
 
                     {kategori.title == 'tugas' ? (
@@ -555,7 +589,7 @@ const Dashboard = () => {
                           trackColor={{false: '#767577', true: '#E8304E'}} // Warna track
                           thumbColor={item.aktifkan ? '#f5dd4b' : '#f4f3f4'} // Warna tombol
                           ios_backgroundColor="#3e3e3e" // Warna background untuk iOS
-                          onValueChange={() => aturAktif(item.idKuliah)} // Fungsi saat switch berubah
+                          onValueChange={() => aturAktif(item.idTugas, 'tugas')} // Fungsi saat switch berubah
                           value={item.aktifkan ? true : false} // Nilai switch (true/false)
                         />
                       </View>
@@ -563,16 +597,16 @@ const Dashboard = () => {
                       <View
                         style={{
                           alignItems: 'center',
-                          marginLeft: item.aktifkan ? w(-2) : w(-10),
+                          marginLeft: item.kumpul ? w(-2) : w(-10),
                         }}>
                         <Text
                           style={{
-                            color: item.aktifkan ? '#00B038' : '#E8304E',
+                            color: item.kumpul ? '#00B038' : '#E8304E',
                             textAlign: 'center',
                             textTransform: 'capitalize',
                             fontSize: w(3.5),
                           }}>
-                          {item.aktifkan ? 'terkumpul' : 'belum dikumpul'}
+                          {item.kumpul ? 'terkumpul' : 'belum dikumpul'}
                         </Text>
                         <View
                           style={{
@@ -585,7 +619,7 @@ const Dashboard = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                           }}>
-                          {item.aktifkan ? (
+                          {item.kumpul ? (
                             <Image
                               source={require('../assets/icons/check.png')}
                               resizeMode={'center'}
