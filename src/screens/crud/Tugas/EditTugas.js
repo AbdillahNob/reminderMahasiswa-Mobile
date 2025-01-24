@@ -17,8 +17,8 @@ import {StatusBar} from 'react-native';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
 import {useRoute} from '@react-navigation/native';
-import {insertJadwalKuliah} from '../../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {updateJadwalTugas} from '../../../Database/Database';
 
 const EditTugas = () => {
   const [namaMataKuliah, setNamaMataKuliah] = useState('');
@@ -26,7 +26,6 @@ const EditTugas = () => {
   const [kelas, setKelas] = useState('');
   const [tanggal, setTanggal] = useState('');
   const [pukul, setPukul] = useState('');
-  const [idUser, setIdUser] = useState('');
 
   const route = useRoute();
   const navigation = useNavigation();
@@ -40,7 +39,7 @@ const EditTugas = () => {
     const updatePukul = pukul || dataTugas.pukul;
 
     try {
-      await insertJadwalKuliah(
+      await updateJadwalTugas(
         dataTugas.idTugas,
         updateNamaMatkul,
         updateNamaTugas,
@@ -48,11 +47,11 @@ const EditTugas = () => {
         updateKelas,
         updatePukul,
       );
-      Alert.alert('INFO', 'Berhasil Menambah Data Jadwal', [
+      Alert.alert('INFO', 'Berhasil Memperbarui Data Tugas', [
         {text: 'OKE', onPress: () => navigasi()},
       ]);
     } catch (err) {
-      console.log(`Gagal mengirim Data Jadwal baru ${err}`);
+      console.log(`Gagal mengirim Pembaruan data Tugas ${err}`);
     }
   };
 
@@ -91,6 +90,7 @@ const EditTugas = () => {
     if (label == 'Pukul') {
       content = (
         <TextInput
+          value={pukul}
           placeholderTextColor={'black'}
           placeholder={placeholder}
           keyboardType="default"
@@ -101,6 +101,7 @@ const EditTugas = () => {
     } else if (label == 'Tanggal') {
       content = (
         <TextInput
+          value={tanggal}
           placeholder={placeholder}
           placeholderTextColor={'black'}
           keyboardType="default"
@@ -156,10 +157,16 @@ const EditTugas = () => {
         if (selectedTime) {
           label == 'Pukul'
             ? setPukul(formatTime(selectedTime))
-            : setTanggal(selectedTime);
+            : setTanggal(formatDate(selectedTime));
         }
       },
     });
+  };
+
+  //Format inputan tanggal
+  const formatDate = date => {
+    const options = {year: 'numeric', month: '2-digit', day: '2-digit'};
+    return date.toLocaleDateString('id-ID', options);
   };
 
   // Format Inputan jadwal
@@ -232,7 +239,7 @@ const EditTugas = () => {
                   fontSize: w(6),
                   textTransform: 'uppercase',
                 }}>
-                buat
+                edit
               </Text>
             </TouchableOpacity>
           </View>

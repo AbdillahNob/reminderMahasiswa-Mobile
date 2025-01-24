@@ -455,6 +455,38 @@ export const updateAktifKuliah = async (idKuliah, aktifkan) => {
   }
 };
 
+export const updateJadwalTugas = async (
+  idTugas,
+  namaMatkul,
+  namaTugas,
+  tanggal,
+  kelas,
+  pukul,
+) => {
+  try {
+    const db = await getDatabase();
+    await db.transaction(tx => {
+      tx.executeSql(
+        `UPDATE tbJadwalTugas SET namaMatkul = ?, namaTugas = ?, tanggal = ?, kelas = ?, pukul = ? WHERE idTugas = ?`,
+        [namaMatkul, namaTugas, tanggal, kelas, pukul, idTugas],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            console.log(`Berhasil Edit Jadwal Tugas : ${results}`);
+          }
+        },
+        (tx, error) => {
+          error.map(err => {
+            console.log(`Gagal Edit Jadwal Tugas : ${err}`);
+          });
+        },
+      );
+    });
+  } catch (err) {
+    console.log(`update Jadwal Tugas Error : ${err}`);
+    throw err;
+  }
+};
+
 export const updateAktifTugas = async (idTugas, aktifkan) => {
   try {
     const db = await getDatabase();
