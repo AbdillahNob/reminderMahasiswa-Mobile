@@ -54,7 +54,7 @@ const EditJadwal = () => {
         updateJamSelesai,
         updateTipeJadwal,
       );
-      Alert.alert('INFO', 'Berhasil EDIT Jadwal Mengajar', [
+      Alert.alert('INFO', 'Berhasil Memperbarui Jadwal Kuliah', [
         {
           text: 'OKE',
           onPress: () => navigation.dispatch(StackActions.replace('Dashboard')),

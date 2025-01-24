@@ -7,15 +7,17 @@ import notifee, {
   TriggerType,
 } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getJadwalKuliah} from '../../Database/Database';
+import {getJadwalKuliah, getJadwalTugas} from '../../Database/Database';
 import ModalPesan from './ModalPesan';
 
 const Notifikasi = ({refreshTrigger}) => {
   const [idUser, setIdUser] = useState('');
   const [dataJadwal, setDataJadwal] = useState([]);
+  const [dataTugas, setDataTugas] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [dataModal, setDataModal] = useState(null);
   const [dataModalJenis, setDataModalJenis] = useState(null);
+  const [type, setType] = useState(null);
 
   useEffect(() => {
     const initializeNotification = async () => {
@@ -33,6 +35,7 @@ const Notifikasi = ({refreshTrigger}) => {
         if (type === EventType.ACTION_PRESS) {
           const item = detail.notification.data?.item;
           const jenisModal = detail.notification.data?.jenisModal;
+          const type = detail.notification.data?.type;
 
           if (!item || !jenisModal) {
             console.log(
@@ -41,9 +44,9 @@ const Notifikasi = ({refreshTrigger}) => {
             return;
           }
           if (detail.pressAction.id === 'stop') {
-            await handleAlarmAction(item, jenisModal);
+            await handleAlarmAction(item, jenisModal, type);
           } else if (detail.pressAction.id === 'open_modal') {
-            await handleAlarmAction(item, jenisModal);
+            await handleAlarmAction(item, jenisModal, type);
           }
         }
       },
@@ -55,6 +58,7 @@ const Notifikasi = ({refreshTrigger}) => {
           if (type === EventType.ACTION_PRESS) {
             const item = detail.notification.data?.item;
             const jenisModal = detail.notification.data?.jenisModal;
+            const type = detail.notification.data?.type;
             // console.log('Jadwal yg sedang aktif alarmnya', item);
 
             if (!item || !jenisModal) {
@@ -64,9 +68,9 @@ const Notifikasi = ({refreshTrigger}) => {
               return;
             }
             if (detail.pressAction.id === 'stop') {
-              await handleAlarmAction(item, jenisModal);
+              await handleAlarmAction(item, jenisModal, type);
             } else if (detail.pressAction.id === 'open_modal') {
-              await handleAlarmAction(item, jenisModal);
+              await handleAlarmAction(item, jenisModal, type);
             }
           }
         } catch (error) {
@@ -111,9 +115,17 @@ const Notifikasi = ({refreshTrigger}) => {
         return hoursA * 60 + minutesA - (hoursB * 60 + minutesB);
       });
 
-      scheduleAlarm(sortedJadwal);
+      scheduleAlarm(sortedJadwal, 'Kuliah');
     }
-  }, [dataJadwal]);
+    if (dataTugas.length > 0) {
+      const sortedTugas = dataTugas.sort((a, b) => {
+        const dateA = new Date(a.tanggal);
+        const dateB = new Date(b.tanggal);
+        return dateA - dateB;
+      });
+      scheduleAlarm(sortedTugas, 'Tugas');
+    }
+  }, [dataJadwal, dataTugas]);
 
   const cekUserSession = async () => {
     try {
@@ -130,8 +142,12 @@ const Notifikasi = ({refreshTrigger}) => {
 
   const fetchJadwal = async userId => {
     try {
-      const hasil = await getJadwalKuliah(userId);
-      setDataJadwal(hasil);
+      const hasilK = await getJadwalKuliah(userId);
+      const hasilT = await getJadwalTugas(userId);
+      console.log('Data Tugas Notifikasi : ', hasilT);
+      console.log('Data Kuliah Notifikasi : ', hasilK);
+      setDataJadwal(hasilK);
+      setDataTugas(hasilT);
     } catch (err) {
       console.error('Error fetching schedule:', err);
     }
@@ -176,43 +192,51 @@ const Notifikasi = ({refreshTrigger}) => {
     });
   };
 
-  const scheduleAlarm = async schedules => {
-    const daysOfWeek = {
-      Senin: 1,
-      Selasa: 2,
-      Rabu: 3,
-      Kamis: 4,
-      Jumat: 5,
-      Sabtu: 6,
-    };
-
+  const scheduleAlarm = async (schedules, type) => {
     const now = new Date();
 
     for (const item of schedules) {
       // Validasi Alarm yg Aktif
       if (!item.aktifkan) continue;
 
-      const hariAngka = daysOfWeek[item.hari];
-      if (!hariAngka) continue;
+      let alarmDate;
 
-      const [hours, minutes] = item.jamMulai.split(':').map(Number);
-      const alarmDate = new Date(now);
-      alarmDate.setDate(now.getDate() + ((hariAngka - now.getDay() + 7) % 7));
-      alarmDate.setHours(hours, minutes, 0, 0);
+      // Vadliasi Notifikasi Tugas atau Kuliah
+      if (type === 'Tugas') {
+        // if(item.kumpul) continue;
 
-      const firstNotificationTime = new Date(alarmDate);
-      firstNotificationTime.setDate(alarmDate.getDate() - 1);
+        const [day, month, year] = item.tanggal.split('/').map(Number);
+        const [hours, minutes] = item.pukul.split(':').map(Number);
+
+        alarmDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+      } else {
+        const daysOfWeek = {
+          Senin: 1,
+          Selasa: 2,
+          Rabu: 3,
+          Kamis: 4,
+          Jumat: 5,
+          Sabtu: 6,
+        };
+        const hariAngka = daysOfWeek[item.hari];
+        if (!hariAngka) continue;
+
+        const [hours, minutes] = item.jamMulai.split(':').map(Number);
+        alarmDate = new Date(now);
+        alarmDate.setDate(now.getDate() + ((hariAngka - now.getDay() + 7) % 7));
+        alarmDate.setHours(hours, minutes, 0, 0);
+      }
 
       const secondNotificationTime = new Date(alarmDate);
       secondNotificationTime.setMinutes(alarmDate.getMinutes() - 15);
 
       const alarmTimes = [
         {
-          label: '15 Menit Sebelumnya',
+          label: '15 Menit Sebelum',
           time: secondNotificationTime,
           jenisModal: 'sebelum 15',
         },
-        {label: 'Saatnya masuk Waktu', time: alarmDate, jenisModal: 'sekarang'},
+        {label: 'Saatnya masuk', time: alarmDate, jenisModal: 'sekarang'},
       ];
 
       for (const {label, time, jenisModal} of alarmTimes) {
@@ -220,7 +244,10 @@ const Notifikasi = ({refreshTrigger}) => {
           await notifee.createTriggerNotification(
             {
               title: '⏰ Alarm Berbunyi!',
-              body: `Pengingat ${label} Jadwal : ${item.jamMulai} pada ${item.hari}`,
+              body:
+                type == 'Tugas'
+                  ? `Pengingat ${label} Tugas : ${item.namaTugas} Jadwal : ${item.pukul} pada Tanggal : ${item.tanggal}`
+                  : `Pengingat ${label} Jadwal : ${item.jamMulai} pada ${item.hari}`,
               android: {
                 channelId: 'alarm-channel-v3',
                 color: AndroidColor.RED,
@@ -249,6 +276,7 @@ const Notifikasi = ({refreshTrigger}) => {
               data: {
                 jenisModal: jenisModal,
                 item: item,
+                type: type,
               },
             },
             {
@@ -265,7 +293,7 @@ const Notifikasi = ({refreshTrigger}) => {
     }
   };
 
-  const handleAlarmAction = async (item, jenisModal) => {
+  const handleAlarmAction = async (item, jenisModal, type) => {
     await stopAlarm();
 
     // Apabila Notifikasi Bunyi, utk menghindari create ulang Async Storage setelah apliksai di tutup dilatar belakang
@@ -274,6 +302,7 @@ const Notifikasi = ({refreshTrigger}) => {
 
     setDataModal(item);
     setDataModalJenis(jenisModal);
+    setType(type);
     setShowModal(true);
   };
 
@@ -289,7 +318,11 @@ const Notifikasi = ({refreshTrigger}) => {
   return (
     <>
       {showModal && (
-        <ModalPesan dataModal={dataModal} dataModalJenis={dataModalJenis} />
+        <ModalPesan
+          dataModal={dataModal}
+          dataModalJenis={dataModalJenis}
+          type={type}
+        />
       )}
     </>
   );

@@ -14,17 +14,15 @@ import {
   widthPercentageToDP as w,
   heightPercentageToDP as h,
 } from '../../utils/responsive';
-import SendIntentAndroid from 'react-native-send-intent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ModalPesan = ({dataModal, dataModalJenis}) => {
+const ModalPesan = ({dataModal, dataModalJenis, type}) => {
   const [modalVisible, setModalVisible] = useState(true);
-  // const [modalVisibleDetail, setModalVisibleDetail] = useState(false);
   const [jenisModal, setJenisModal] = useState(null);
-  // const [dataModalDetail, setDataModalDetail] = useState(null);
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
+    // console.log('tipe : ', type);
     checkAsyncStorage();
   }, []);
 
@@ -49,12 +47,23 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
   };
 
   const deskripsi = () => {
-    const data = [
-      {value: dataModal.namaMatkul},
-      {label: 'hari', value: dataModal.hari},
-      {label: 'ruangan', value: dataModal.ruangan},
-      {label: 'kelas', value: dataModal.kelas},
-    ];
+    let data = [];
+    if (type == 'Kuliah') {
+      data = [
+        {value: dataModal.namaMatkul},
+        {label: 'hari', value: dataModal.hari},
+        {label: 'ruangan', value: dataModal.ruangan},
+        {label: 'kelas', value: dataModal.kelas},
+      ];
+    } else {
+      data = [
+        {value: dataModal.namaMatkul},
+        {label: 'Tanggal', value: dataModal.tanggal},
+        {label: 'Kelas', value: dataModal.kelas},
+        {label: 'Pukul', value: dataModal.pukul},
+      ];
+    }
+
     return data.map(({label, value}, key) => (
       <View key={key} style={{alignItems: 'flex-start'}}>
         <Text
@@ -89,7 +98,7 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
     let keterangan = ket;
 
     // utk Validasi apakah alarm ini jadwalKuliah atau Tugas
-    if (dataModal.hari) {
+    if (type == 'Kuliah') {
       return (
         <TouchableOpacity
           style={styles.buttonModal}
@@ -121,7 +130,7 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
       } else if (keterangan == 'sebelum 15') {
         const data = [
           {value: 'Tugas ini telah saya kumpulkan'},
-          {value: 'Tugas ini sedang saya kerja'},
+          {value: 'Tugas ini sedang saya kerjakan'},
         ];
         return data.map(({value}, key) => (
           <View key={key}>
@@ -146,61 +155,6 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
   };
 
   const cekListTugas = () => {};
-
-  // const openModalDetail = () => {
-  //   setModalVisible(false);
-  //   setModalVisibleDetail(true);
-  // };
-
-  // const alasanDetail = () => {
-  //   const data = [
-  //     {
-  //       id: 1,
-  //       value: 'Saya Sedang Sakit, jadi tidak bisa masuk di kelas 1-TALGO-H',
-  //     },
-  //     {
-  //       id: 2,
-  //       value:
-  //         'Saya lagi ada kegiatan, jadi tidak bisa masuk di kelas 1-TALGO-H',
-  //     },
-  //   ];
-  //   return data.map(({value, id}, key) => (
-  //     <View key={key}>
-  //       <TouchableOpacity value={value} onPress={() => aturSentWa(value)}>
-  //         <Text
-  //           style={{
-  //             width: w('65%'),
-  //             fontSize: w(4),
-  //             color: 'black',
-  //             fontWeight: 'medium',
-  //           }}>{`${id}. ${value}`}</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //   ));
-  // };
-
-  // const sendMessageWa = async message => {
-  //   setModalVisible(false);
-  //   setModalVisibleDetail(false);
-  //   try {
-  //     SendIntentAndroid.sendText({
-  //       text: message,
-  //       type: SendIntentAndroid.TEXT_PLAIN,
-  //       packageName: 'com.whatsapp',
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // const aturSentWa = async value => {
-  //   // const grupKelas = 'https://chat.whatsapp.com/IXKCUISiozMISOtGWpBg6t';
-  //   // const grupStafFo = 'https://chat.whatsapp.com/LsIa1zJ3JMVBdCeVsKjpyq';
-  //   const message = value;
-
-  //   await sendMessageWa(message);
-  //   await sendMessageWa(message);
-  // };
 
   return (
     <>
@@ -294,7 +248,9 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
                   color: 'black',
                   TextAlign: 'center',
                 }}>
-                {dataModal.jamMulai} - {dataModal.jamSelesai}
+                {type === 'Tugas'
+                  ? dataModal.pukul
+                  : dataModal.jamMulai - dataModal.jamSelesai}
               </Text>
               <View
                 style={{
@@ -319,35 +275,6 @@ const ModalPesan = ({dataModal, dataModalJenis}) => {
           </View>
         </Modal>
       )}
-
-      {/* Modal DETAIL */}
-      {/* {modalVisibleDetail ? (
-        <Modal
-          visible={modalVisibleDetail}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={closeModal}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text
-                style={{fontSize: w(5), color: 'black', fontWeight: 'bold'}}>
-                Alasan Tidak Hadir
-              </Text>
-              <View
-                style={{
-                  width: w('70%'),
-                  height: h(0.2),
-                  backgroundColor: 'black',
-                  marginTop: h(1.2),
-                  borderRadius: w(4),
-                  marginBottom: h(1.5),
-                }}
-              />
-              {alasanDetail()}
-            </View>
-          </View>
-        </Modal>
-      ) : null} */}
     </>
   );
 };
