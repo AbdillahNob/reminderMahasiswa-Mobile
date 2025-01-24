@@ -100,7 +100,7 @@ export const buatJadwalTugas = async () => {
     const db = await getDatabase(); //Tunggu getDatabase smpi database selesai dihubungkan
     await db.transaction(tx => {
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS tbTugas (
+        `CREATE TABLE IF NOT EXISTS tbJadwalTugas (
                 idTugas INTEGER PRIMARY KEY AUTOINCREMENT,
                 idUser INTEGER,
                 namaMatkul TEXT,
@@ -193,18 +193,66 @@ export const insertJadwalKuliah = async (
         ],
         (tx, results) => {
           if (results.rowsAffected > 0) {
-            console.log(`Berhasil tambah Jadwal : ${results}`);
+            console.log(`Berhasil tambah Jadwal Kuliah : ${results}`);
           }
         },
         (tx, error) => {
           error.map(err => {
-            console.log(`Gagal menambahkan Jadwal : ${err}`);
+            console.log(`Gagal menambahkan Jadwal Kuliah : ${err}`);
           });
         },
       );
     });
   } catch (err) {
-    console.log(`insertJadwal Error : ${err}`);
+    console.log(`insertJadwalKuliah Error : ${err}`);
+    throw err;
+  }
+};
+
+export const insertJadwalTugas = async (
+  idUser,
+  namaMatkul,
+  namaTugas,
+  tanggal,
+  kelas,
+  pukul,
+  kumpul,
+  aktifkan,
+) => {
+  try {
+    const db = await getDatabase();
+    await db.transaction(tx => {
+      tx.executeSql(
+        `INSERT INTO tbJadwalTugas (idUser, namaMatkul, namaTugas, tanggal, kelas, pukul, kumpul, aktifkan) VALUES (?,?,?,?,?,?,?,?);`,
+        [
+          idUser,
+          namaMatkul,
+          namaTugas,
+          tanggal,
+          kelas,
+          pukul,
+          kumpul ? 1 : 0,
+          aktifkan ? 1 : 0,
+        ],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            const rows = results.rows.raw();
+            console.log(`Berhasil tambah Jadwal Tugas : ${results}`);
+            console.log('Jumlah Data Jadwal Tugas', rows.length);
+            rows.map(item => {
+              console.log('Data Jadwal Tugas dengan idTugas : ', item.idTugas);
+            });
+          }
+        },
+        (tx, error) => {
+          error.map(err => {
+            console.log(`Gagal menambahkan Jadwal Tugas : ${err}`);
+          });
+        },
+      );
+    });
+  } catch (err) {
+    console.log(`insertJadwalTugas Error : ${err}`);
     throw err;
   }
 };
@@ -282,10 +330,44 @@ export const getJadwalKuliah = async idUser => {
           [idUser],
           (tx, results) => {
             const rows = results.rows.raw();
-            console.log('Jumlah Data Jadwal Mengajar : ', rows.length);
+            // console.log('Jumlah Data Jadwal Mengajar : ', rows.length);
+            // rows.map(data => {
+            //   console.log(
+            //     `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
+            //   );
+            // });
+
+            resolve(rows);
+          },
+          (tx, error) => {
+            console.log(
+              `Error membaca data dari tabel tbJadwalKuliah : ${error}`,
+            );
+            reject(error);
+          },
+        );
+      });
+    });
+  } catch (err) {
+    console.log('Error pada fungsi getData : ', err);
+    throw err;
+  }
+};
+
+export const getJadwalTugas = async idUser => {
+  try {
+    const db = await getDatabase();
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          `SELECT * FROM tbJadwalTugas WHERE idUser = ?`,
+          [idUser],
+          (tx, results) => {
+            const rows = results.rows.raw();
+            console.log('Jumlah Data Jadwal Tugas : ', rows.length);
             rows.map(data => {
               console.log(
-                `Berhasil tarik Data Jadwal Mengajar dengan idUser : ${data.aktifkan}`,
+                `Berhasil tarik Data Jadwal Tugas dengan idTugas : ${data.namaTugas}`,
               );
             });
 
@@ -446,7 +528,7 @@ export const hapusTabel = async () => {
   const db = await openDb();
   db.transaction(tx => {
     tx.executeSql(
-      `DROP TABLE IF EXISTS tbJadwalKuliah`,
+      `DROP TABLE IF EXISTS tbTugas`,
       [],
       (tx, results) => {
         console.log('Berhasil Hapus Tabel');

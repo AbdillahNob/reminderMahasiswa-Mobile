@@ -23,6 +23,7 @@ import {
   getJadwalKuliah,
   hapusDataKuliah,
   updateAktifKuliah,
+  getJadwalTugas,
 } from '../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notifikasi from './notifikasi/Notifikasi';
@@ -76,8 +77,9 @@ const Dashboard = () => {
 
   const fetch = async idUser => {
     try {
-      const hasil = await getJadwalKuliah(idUser);
-      setDataJadwal(hasil);
+      const hasilK = await getJadwalKuliah(idUser);
+      const hasilT = await getJadwalTugas(idUser);
+      setDataJadwal(hasilK);
     } catch (error) {
       console.log(`Gagal Ambil data Jadwal : ${error}`);
     }

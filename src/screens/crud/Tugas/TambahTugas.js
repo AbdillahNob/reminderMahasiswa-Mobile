@@ -16,7 +16,7 @@ import {
 import {StatusBar} from 'react-native';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
-import {insertJadwalKuliah} from '../../../Database/Database';
+import {insertJadwalTugas} from '../../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TambahTugas = () => {
@@ -25,6 +25,8 @@ const TambahTugas = () => {
   const [kelas, setKelas] = useState('');
   const [tanggal, setTanggal] = useState('');
   const [pukul, setPukul] = useState('');
+  const [aktifkan, setAktifkan] = useState(false);
+  const [kumpul, setKumpul] = useState(false);
   const [idUser, setIdUser] = useState('');
 
   const navigation = useNavigation();
@@ -58,19 +60,21 @@ const TambahTugas = () => {
     console.log(idUser);
     if (idUser && namaMataKuliah && namaTugas && tanggal && kelas && pukul) {
       try {
-        await insertJadwalKuliah(
+        await insertJadwalTugas(
           idUser,
           namaMataKuliah,
           namaTugas,
           tanggal,
           kelas,
           pukul,
+          kumpul,
+          aktifkan,
         );
-        Alert.alert('INFO', 'Berhasil Menambah Data Jadwal', [
+        Alert.alert('INFO', 'Berhasil Menambah Data Jadwal Tugas', [
           {text: 'OKE', onPress: () => navigasi()},
         ]);
       } catch (err) {
-        console.log(`Gagal mengirim Data Jadwal baru ${err}`);
+        console.log(`Gagal mengirim Data Jadwal Tugas baru ${err}`);
       }
     } else {
       Alert.alert('INFO', 'Error Harap semua inputan di isi!');
@@ -112,6 +116,7 @@ const TambahTugas = () => {
     if (label == 'Pukul') {
       content = (
         <TextInput
+          value={pukul}
           placeholderTextColor={'black'}
           placeholder={placeholder}
           keyboardType="default"
@@ -122,6 +127,7 @@ const TambahTugas = () => {
     } else if (label == 'Tanggal') {
       content = (
         <TextInput
+          value={tanggal}
           placeholder={placeholder}
           placeholderTextColor={'black'}
           keyboardType="default"
@@ -177,13 +183,19 @@ const TambahTugas = () => {
         if (selectedTime) {
           label == 'Pukul'
             ? setPukul(formatTime(selectedTime))
-            : setTanggal(selectedTime);
+            : setTanggal(formatDate(selectedTime));
         }
       },
     });
   };
 
-  // Format Inputan jadwal
+  //Format inputan tanggal
+  const formatDate = date => {
+    const options = {year: 'numeric', month: '2-digit', day: '2-digit'};
+    return date.toLocaleDateString('id-ID', options);
+  };
+
+  // Format Inputan pukul
   const formatTime = time => {
     const hours = String(time.getHours()).padStart(2, '0');
     const minutes = String(time.getMinutes()).padStart(2, '0');

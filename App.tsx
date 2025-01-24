@@ -15,6 +15,7 @@ import {
   getDatabase,
   buatAkun,
   buatJadwalKuliah,
+  buatJadwalTugas,
   cekTabel,
   cekAllTabel,
   hapusTabel,
