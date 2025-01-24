@@ -25,15 +25,8 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   useEffect(() => {
-    const initApp = async () => {
-      try {
-        getDatabase();
-        cekAllTabel();
-      } catch (error) {
-        console.log('Gagal menjalan Perintah Query', error);
-      }
-    };
-    initApp();
+    getDatabase();
+    cekAllTabel();
   }, []);
   return (
     <>

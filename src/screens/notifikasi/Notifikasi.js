@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getJadwalKuliah, getJadwalTugas} from '../../Database/Database';
 import ModalPesan from './ModalPesan';
 
-const Notifikasi = ({refreshTrigger}) => {
+const Notifikasi = ({refreshTrigger, onUpdate}) => {
   const [idUser, setIdUser] = useState('');
   const [dataJadwal, setDataJadwal] = useState([]);
   const [dataTugas, setDataTugas] = useState([]);
@@ -145,7 +145,7 @@ const Notifikasi = ({refreshTrigger}) => {
       const hasilK = await getJadwalKuliah(userId);
       const hasilT = await getJadwalTugas(userId);
       console.log('Data Tugas Notifikasi : ', hasilT);
-      console.log('Data Kuliah Notifikasi : ', hasilK);
+      // console.log('Data Kuliah Notifikasi : ', hasilK);
       setDataJadwal(hasilK);
       setDataTugas(hasilT);
     } catch (err) {
@@ -322,6 +322,10 @@ const Notifikasi = ({refreshTrigger}) => {
           dataModal={dataModal}
           dataModalJenis={dataModalJenis}
           type={type}
+          onUpdate={(id, kumpul) => {
+            onUpdate(id, kumpul); // Propagate the update to the parent
+            setShowModal(false);
+          }}
         />
       )}
     </>

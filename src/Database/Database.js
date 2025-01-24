@@ -364,12 +364,12 @@ export const getJadwalTugas = async idUser => {
           [idUser],
           (tx, results) => {
             const rows = results.rows.raw();
-            console.log('Jumlah Data Jadwal Tugas : ', rows.length);
-            rows.map(data => {
-              console.log(
-                `Berhasil tarik Data Jadwal Tugas dengan idTugas : ${data.aktifkan}`,
-              );
-            });
+            // console.log('Jumlah Data Jadwal Tugas : ', rows.length);
+            // rows.map(data => {
+            //   console.log(
+            //     `Berhasil tarik Data Jadwal Tugas dengan kumpul : ${data.kumpul}`,
+            //   );
+            // });
 
             resolve(rows);
           },
@@ -506,6 +506,30 @@ export const updateAktifTugas = async (idTugas, aktifkan) => {
     console.error('Error updating status Tugas:', JSON.stringify(err, null, 2));
   }
 };
+
+export const updateKumpulTugas = async (idTugas, kumpul) => {
+  try {
+    const db = await getDatabase();
+    await db.transaction(tx => {
+      tx.executeSql(
+        `UPDATE tbJadwalTugas SET kumpul = ? WHERE idTugas = ?`,
+        [kumpul ? 1 : 0, idTugas],
+        (tx, results) => {
+          console.log(`DEBUG Berhasil Edit Pengumpulan  Tugas : ${results}`);
+        },
+        (tx, error) => {
+          console.log(`Error mengedit Pengumupulan Tugas : ${error}`);
+        },
+      );
+    });
+  } catch (err) {
+    console.error(
+      'Error updating Pengumpulan Tugas:',
+      JSON.stringify(err, null, 2),
+    );
+  }
+};
+
 // Hapus Data
 export const hapusDataKuliah = async id => {
   try {

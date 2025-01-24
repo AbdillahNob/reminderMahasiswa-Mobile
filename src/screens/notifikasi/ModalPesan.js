@@ -15,14 +15,15 @@ import {
   heightPercentageToDP as h,
 } from '../../utils/responsive';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {updateKumpulTugas} from '../../Database/Database';
 
-const ModalPesan = ({dataModal, dataModalJenis, type}) => {
+const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [jenisModal, setJenisModal] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
-    // console.log('tipe : ', type);
     checkAsyncStorage();
   }, []);
 
@@ -94,6 +95,38 @@ const ModalPesan = ({dataModal, dataModalJenis, type}) => {
     ));
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const cekListTugas = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+
+    try {
+      setModalVisible(false);
+      const hasilKumpul = !dataModal.kumpul;
+      console.log('Hasil Kumpul : ', hasilKumpul);
+
+      // const updateData = {...dataModal, kumpul: hasilKumpul};
+      // await AsyncStorage.setItem('updateKumpul', JSON.stringify(updateData));
+      await updateKumpulTugas(dataModal.idTugas, hasilKumpul);
+
+      // Panggil fungsi onUpdate untuk memberitahu parent bahwa data telah berubah
+      if (onUpdate) {
+        onUpdate(dataModal.idTugas, hasilKumpul);
+      }
+
+      Alert.alert('Info', 'Save pengumpulan tugas', [
+        {text: 'oke', onPress: () => console.log('Kumpul Tugas Update')},
+      ]);
+    } catch (error) {
+      console.log('Error CekListTugas : ', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const button = ket => {
     let keterangan = ket;
 
@@ -109,52 +142,31 @@ const ModalPesan = ({dataModal, dataModalJenis, type}) => {
         </TouchableOpacity>
       );
     } else {
-      if (keterangan === 'sekarang') {
-        const data = [
-          {value: 'Tugas ini telah saya kumpulkan'},
-          {value: 'Tugas ini tidak saya kumpul'},
-        ];
-        return data.map(({value}, key) => (
-          <View key={key}>
-            <TouchableOpacity
-              style={styles.buttonModal}
-              onPress={() =>
-                value == 'Tugas ini telah saya kumpulkan'
-                  ? cekListTugas()
-                  : setModalVisible(false)
-              }>
-              <Text style={styles.buttonModalText}>{value}</Text>
-            </TouchableOpacity>
-          </View>
-        ));
-      } else if (keterangan == 'sebelum 15') {
-        const data = [
-          {value: 'Tugas ini telah saya kumpulkan'},
-          {value: 'Tugas ini sedang saya kerjakan'},
-        ];
-        return data.map(({value}, key) => (
-          <View key={key}>
-            <TouchableOpacity
-              style={styles.buttonModal}
-              onPress={() =>
-                value == 'Tugas ini telah saya kumpulkan'
-                  ? cekListTugas()
-                  : setModalVisible(false)
-              }>
-              <Text style={styles.buttonModalText}>{value}</Text>
-            </TouchableOpacity>
-          </View>
-        ));
-      }
+      const data =
+        keterangan === 'sekarang'
+          ? [
+              {value: 'Tugas ini telah saya kumpulkan'},
+              {value: 'Tugas ini tidak saya kumpulkan'},
+            ]
+          : [
+              {value: 'Tugas ini telah saya kumpulkan'},
+              {value: 'Tugas ini sedang saya kerjakan'},
+            ];
+      return data.map(({value}, key) => (
+        <View key={key}>
+          <TouchableOpacity
+            style={styles.buttonModal}
+            onPress={() =>
+              value === 'Tugas ini telah saya kumpulkan'
+                ? cekListTugas()
+                : closeModal()
+            }>
+            <Text style={styles.buttonModalText}>{value}</Text>
+          </TouchableOpacity>
+        </View>
+      ));
     }
   };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    // setModalVisibleDetail(false);
-  };
-
-  const cekListTugas = () => {};
 
   return (
     <>

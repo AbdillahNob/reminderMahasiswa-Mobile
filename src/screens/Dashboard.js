@@ -48,19 +48,21 @@ const Dashboard = () => {
   useEffect(() => {
     // console.log(jadwal);
     checkUserSession();
+    // checkKumpul();
   }, []);
 
   useEffect(() => {
     if (idUser) {
       fetch(idUser);
     }
-  }, [idUser]);
+  }, [refreshTrigger, idUser]);
 
   const checkUserSession = async () => {
     try {
       const storedUserId = await AsyncStorage.getItem('idUser');
-      const dataModal = await AsyncStorage.getItem('dataModalStorage');
-      console.log('Dashboard tangkap data Modal : ', dataModal);
+      // const dataModal = await AsyncStorage.getItem('dataModalStorage');
+      // console.log('Dashboard tangkap data Modal : ', dataModal);
+
       if (storedUserId) {
         setIdUser(storedUserId);
       } else {
@@ -82,6 +84,7 @@ const Dashboard = () => {
     try {
       const hasilK = await getJadwalKuliah(idUser);
       const hasilT = await getJadwalTugas(idUser);
+
       setDataTugas(hasilT);
       setDataJadwal(hasilK);
     } catch (error) {
@@ -371,9 +374,17 @@ const Dashboard = () => {
     // console.log(itemToUpdate);
   };
 
+  const handleUpdate = (id, kumpul) => {
+    setDataTugas(prev =>
+      prev.map(item =>
+        item.idTugas === id ? {...item, kumpul: kumpul} : item,
+      ),
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Notifikasi refreshTrigger={refreshTrigger} />
+      <Notifikasi refreshTrigger={refreshTrigger} onUpdate={handleUpdate} />
       <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
       {/* Agar setiap perubahan baik edit dan hapus lngsng terefresh data yg tampil di HEADER */}
       {idUser || dataJadwal.length > 0 ? (
