@@ -24,6 +24,7 @@ import {
   hapusDataKuliah,
   updateAktifKuliah,
   getJadwalTugas,
+  hapusDataTugas,
   updateAktifTugas,
 } from '../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -202,32 +203,55 @@ const Dashboard = () => {
   };
 
   const buttonModal = item => {
-    const deleteData = async ({idKuliah, namaMatkul, idUser}) => {
+    const deleteData = async item => {
       Alert.alert('INFO', 'Apakah Anda yakin ingin Hapus', [
         {text: 'Batal', style: 'Cancel'},
         {
           text: 'Hapus',
           onPress: async () => {
             try {
-              if (idKuliah) {
-                await hapusDataKuliah(idKuliah);
+              if (kategori.title == 'kuliah') {
+                if (item.idKuliah) {
+                  await hapusDataKuliah(item.idKuliah);
 
-                Alert.alert(
-                  'INFO',
-                  `Berhasil Hapus Mata Kuliah : ${namaMatkul}`,
-                  [
-                    {
-                      text: 'OKE',
-                    },
-                  ],
-                );
-                // Agar bisa langsung refresh Data yg tampil
-                fetch(idUser);
-              } else {
-                Alert.alert(
-                  'INFO',
-                  `idKuliah tidak ditemukan : ${data.idKuliah}`,
-                );
+                  Alert.alert(
+                    'INFO',
+                    `Berhasil Hapus Mata Kuliah : ${item.namaMatkul}`,
+                    [
+                      {
+                        text: 'OKE',
+                      },
+                    ],
+                  );
+                  // Agar bisa langsung refresh Data yg tampil
+                  fetch(item.idUser);
+                } else {
+                  Alert.alert(
+                    'INFO',
+                    `idKuliah tidak ditemukan : ${item.idKuliah}`,
+                  );
+                }
+              } else if (kategori.title == 'tugas') {
+                if (item.idTugas) {
+                  await hapusDataTugas(item.idTugas);
+
+                  Alert.alert(
+                    'INFO',
+                    `Berhasil Hapus data Tugas dengan Mata Kuliah : ${item.namaMatkul}`,
+                    [
+                      {
+                        text: 'OKE',
+                      },
+                    ],
+                  );
+                  // Agar bisa langsung refresh Data yg tampil
+                  fetch(item.idUser);
+                } else {
+                  Alert.alert(
+                    'INFO',
+                    `idTugas tidak ditemukan : ${item.idTugas}`,
+                  );
+                }
               }
             } catch (error) {
               Alert.alert('ERROR', 'Gagal Menghapus Data');
@@ -260,7 +284,7 @@ const Dashboard = () => {
           link: 'EditTugas',
         },
         {
-          label: 'hapus jadwal kuliah',
+          label: 'hapus jadwal Tugas',
           icon: require('../assets/icons/trash.png'),
         },
       ];

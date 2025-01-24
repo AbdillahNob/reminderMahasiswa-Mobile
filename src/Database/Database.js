@@ -531,6 +531,30 @@ export const hapusDataKuliah = async id => {
   }
 };
 
+export const hapusDataTugas = async id => {
+  try {
+    const db = await getDatabase();
+    await db.transaction(tx => {
+      tx.executeSql(
+        `DELETE FROM tbJadwalTugas WHERE idTugas = ?;`,
+        [id],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            console.log(`Berhasil Hapus Data Tugas dengan id : ${id}`);
+          } else {
+            console.log(`Data Tugas dengan id : ${id} tidak ditemukan`);
+          }
+        },
+        (tx, error) => {
+          console.log(`Gagal Menghapus Data Tugas : ${error}`);
+        },
+      );
+    });
+  } catch (err) {
+    console.log(`Fungsi hapusDataTugas error : ${err}`);
+  }
+};
+
 // cek semua tabel dan jumlah
 export const cekAllTabel = async () => {
   const db = await getDatabase();
