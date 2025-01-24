@@ -15,11 +15,13 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAkunDetail} from '../Database/Database';
 
-const HeaderDashboard = ({idUser, dataJadwal}) => {
+const HeaderDashboard = ({idUser, dataJadwal, dataTugas}) => {
   const navigation = useNavigation();
   const [dataUser, setDataUser] = useState(null);
   const [hariIni, setHariIni] = useState([]);
   const [totalJadwal, setTotalJadwal] = useState(0);
+  const [tugasHariIni, setTugasHariIni] = useState([]);
+  const [totalTugas, setTotalTugas] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,9 +64,37 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
       }
     };
 
+    const fetchTugas = async () => {
+      if (dataTugas && Array.isArray(dataTugas)) {
+        const now = new Date();
+
+        // Format tanggal hari ini
+        const todayDate = `${now.getDate().toString().padStart(2, '0')}/${(
+          now.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, '0')}/${now.getFullYear()}`;
+
+        // Filter tugas yang sesuai dengan tanggal hari ini
+        const jadwalToday = dataTugas.filter(item => {
+          if (item.tanggal && typeof item.tanggal === 'string') {
+            return item.tanggal === todayDate;
+          }
+          return false;
+        });
+
+        setTugasHariIni(jadwalToday);
+        setTotalTugas(dataTugas.length);
+      } else {
+        setTugasHariIni([]);
+        setTotalTugas(0);
+      }
+    };
+
     fetchData();
     fetchJadwal();
-  }, [idUser, dataJadwal]);
+    fetchTugas();
+  }, [idUser, dataJadwal, dataTugas]);
 
   const logout = async () => {
     Alert.alert('INFO', 'Apakah anda yakin ingin Log Out?', [
@@ -89,6 +119,8 @@ const HeaderDashboard = ({idUser, dataJadwal}) => {
     const ketKuliah = [
       {label: 'Kuliah Hari ini', value: hariIni.length},
       {label: 'total kuliah', value: totalJadwal},
+      {label: 'Tugas Hari ini', value: tugasHariIni.length},
+      {label: 'total Tugas', value: totalTugas},
     ];
     return ketKuliah.map(({label, value}, key) => {
       return (

@@ -148,8 +148,10 @@ const Dashboard = () => {
               marginLeft: w(5),
               textTransform: 'capitalize',
             }}>
-            Jadwal{' '}
-            {kategori.title !== 'history' ? kategori.title : 'history tugas'}{' '}
+            {kategori.title === 'history' ? null : 'Jadwal '}
+            {kategori.title !== 'history'
+              ? kategori.title
+              : 'history tugas'}{' '}
             Anda{' '}
           </Text>
           {kategori.title !== 'history' ? (
@@ -161,7 +163,7 @@ const Dashboard = () => {
           ) : (
             <Image
               source={require('../assets/icons/book.png')}
-              style={{width: w(6), height: h(3), marginRight: w(26)}}
+              style={{width: w(6), height: h(3), marginRight: w(43)}}
               resizeMode={'cover'}
             />
           )}
@@ -388,7 +390,11 @@ const Dashboard = () => {
       <StatusBar backgroundColor={'#2A2A2A'} barStyle={'light-content'} />
       {/* Agar setiap perubahan baik edit dan hapus lngsng terefresh data yg tampil di HEADER */}
       {idUser || dataJadwal.length > 0 ? (
-        <HeaderDashboard idUser={idUser} dataJadwal={dataJadwal} />
+        <HeaderDashboard
+          idUser={idUser}
+          dataJadwal={dataJadwal}
+          dataTugas={dataTugas}
+        />
       ) : null}
       {headerMainView()}
       <SafeAreaView style={styles.containerScroll}>
