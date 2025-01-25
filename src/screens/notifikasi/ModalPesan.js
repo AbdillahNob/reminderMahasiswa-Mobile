@@ -204,7 +204,9 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
                   TextAlign: 'center',
                   textTransform: 'capitalize',
                 }}>
-                {dataModal.jamMulai} - {dataModal.jamSelesai}
+                {type === 'Tugas'
+                  ? dataModal.pukul
+                  : dataModal.jamMulai - dataModal.jamSelesai}
               </Text>
               <View
                 style={{
