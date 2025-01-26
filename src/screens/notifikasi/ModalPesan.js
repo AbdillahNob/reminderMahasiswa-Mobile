@@ -6,7 +6,6 @@ import {
   Modal,
   TouchableOpacity,
   Image,
-  Linking,
   Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -49,7 +48,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
 
   const deskripsi = () => {
     let data = [];
-    if (type == 'Kuliah') {
+    if (type === 'Kuliah') {
       data = [
         {value: dataModal.namaMatkul},
         {label: 'hari', value: dataModal.hari},
@@ -67,30 +66,30 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
 
     return data.map(({label, value}, key) => (
       <View key={key} style={{alignItems: 'flex-start'}}>
-        <Text
-          style={{
-            color: 'black',
-            fontWeight: 'bold',
-            marginBottom: h(1.5),
-            textAlign: 'center',
-            fontSize: w(4.8),
-          }}>
-          {label ? (
-            <Text
-              style={{
-                color: 'black',
-                fontWeight: 'medium',
-                marginBottom: h(1.5),
-                textAlign: 'left',
-                fontSize: w(4),
-                textTransform: 'capitalize',
-              }}>
-              {label} : {value}
-            </Text>
-          ) : (
-            value
-          )}
-        </Text>
+        {label ? (
+          <Text
+            style={{
+              color: 'black',
+              fontWeight: 'medium',
+              marginBottom: h(1.5),
+              textAlign: 'left',
+              fontSize: w(4),
+              textTransform: 'capitalize',
+            }}>
+            {label}: {value}
+          </Text>
+        ) : (
+          <Text
+            style={{
+              color: 'black',
+              fontWeight: 'bold',
+              marginBottom: h(1.5),
+              textAlign: 'center',
+              fontSize: w(4.8),
+            }}>
+            {value}
+          </Text>
+        )}
       </View>
     ));
   };
@@ -104,22 +103,15 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     setIsProcessing(true);
 
     try {
-      setModalVisible(false);
       const hasilKumpul = !dataModal.kumpul;
-      console.log('Hasil Kumpul : ', hasilKumpul);
 
-      // const updateData = {...dataModal, kumpul: hasilKumpul};
-      // await AsyncStorage.setItem('updateKumpul', JSON.stringify(updateData));
       await updateKumpulTugas(dataModal.idTugas, hasilKumpul);
-
-      // Panggil fungsi onUpdate untuk memberitahu parent bahwa data telah berubah
       if (onUpdate) {
         onUpdate(dataModal.idTugas, hasilKumpul);
       }
 
-      Alert.alert('Info', 'Save pengumpulan tugas', [
-        {text: 'oke', onPress: () => console.log('Kumpul Tugas Update')},
-      ]);
+      setModalVisible(false);
+      Alert.alert('Info', 'Save pengumpulan tugas berhasil');
     } catch (error) {
       console.log('Error CekListTugas : ', error);
     } finally {
@@ -128,10 +120,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   };
 
   const button = ket => {
-    let keterangan = ket;
-
-    // utk Validasi apakah alarm ini jadwalKuliah atau Tugas
-    if (type == 'Kuliah') {
+    if (type === 'Kuliah') {
       return (
         <TouchableOpacity
           style={styles.buttonModal}
@@ -143,7 +132,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
       );
     } else {
       const data =
-        keterangan === 'sekarang'
+        ket === 'sekarang'
           ? [
               {value: 'Tugas ini telah saya kumpulkan'},
               {value: 'Tugas ini tidak saya kumpulkan'},
@@ -171,124 +160,30 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   return (
     <>
       <StatusBar backgroundColor={'#0F4473'} barStyle={'light-content'} />
-      {jenisModal == 'sekarang' ? (
-        <Modal
-          visible={modalVisible}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={closeModal}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Image
-                source={require('../../assets/images/logoAlarm.png')}
-                style={{width: w(16), height: h(8), elevation: 2}}
-                resizeMode="contain"
-              />
-              <Text
-                style={{
-                  color: '#E8304E',
-                  fontWeight: 'bold',
-                  textTransform: 'capitalize',
-                  fontSize: w(6),
-                  marginTop: h(0.5),
-                  marginBottom: w(2.2),
-                }}>
-                kelas mengajar anda
-              </Text>
-              <Text
-                style={{
-                  marginBottom: h(1),
-                  fontSize: w(5),
-                  fontWeight: 'bold',
-                  color: 'black',
-                  TextAlign: 'center',
-                  textTransform: 'capitalize',
-                }}>
-                {type === 'Tugas'
-                  ? dataModal.pukul
-                  : dataModal.jamMulai - dataModal.jamSelesai}
-              </Text>
-              <View
-                style={{
-                  width: w('70%'),
-                  height: h(0.2),
-                  backgroundColor: 'black',
-                  borderRadius: w(4),
-                  marginBottom: h(1.5),
-                }}
-              />
-              <View
-                style={{
-                  marginBottom: h(1),
-                  marginLeft: w(7),
-                  marginRight: w(7),
-                }}>
-                {deskripsi()}
-              </View>
-              {button('sekarang')}
-              {/* Tombol untuk menutup modal */}
-            </View>
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={closeModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image
+              source={require('../../assets/images/logoAlarm.png')}
+              style={{width: w(16), height: h(8), elevation: 2}}
+              resizeMode="contain"
+            />
+            <Text style={styles.modalTextTitle}>kelas mengajar anda</Text>
+            <Text style={styles.modalText}>
+              {type === 'Tugas'
+                ? dataModal.pukul
+                : `${dataModal.jamMulai} - ${dataModal.jamSelesai}`}
+            </Text>
+            <View style={styles.divider} />
+            <View style={styles.descriptionContainer}>{deskripsi()}</View>
+            {button(jenisModal)}
           </View>
-        </Modal>
-      ) : (
-        <Modal
-          visible={modalVisible}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={closeModal}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Image
-                source={require('../../assets/images/logoAlarm.png')}
-                style={{width: w(16), height: h(8), elevation: 2}}
-                resizeMode="contain"
-              />
-              <Text
-                style={{
-                  color: '#E8304E',
-                  fontWeight: 'bold',
-                  textTransform: 'capitalize',
-                  fontSize: w(6),
-                  marginTop: h(0.5),
-                  marginBottom: w(2.2),
-                }}>
-                kelas mengajar anda
-              </Text>
-              <Text
-                style={{
-                  marginBottom: h(1),
-                  fontSize: w(5),
-                  fontWeight: 'bold',
-                  color: 'black',
-                  TextAlign: 'center',
-                }}>
-                {type === 'Tugas'
-                  ? dataModal.pukul
-                  : dataModal.jamMulai - dataModal.jamSelesai}
-              </Text>
-              <View
-                style={{
-                  width: w('70%'),
-                  height: h(0.2),
-                  backgroundColor: 'black',
-                  borderRadius: w(4),
-                  marginBottom: h(1.5),
-                }}
-              />
-              <View
-                style={{
-                  marginBottom: h(1),
-                  marginLeft: w(7),
-                  marginRight: w(7),
-                }}>
-                {deskripsi()}
-              </View>
-              {button(jenisModal)}
-              {/* Tombol untuk menutup modal */}
-            </View>
-          </View>
-        </Modal>
-      )}
+        </View>
+      </Modal>
     </>
   );
 };
@@ -300,7 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background semi-transparan
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: w('82%'),
@@ -333,12 +228,30 @@ const styles = StyleSheet.create({
     fontSize: w(5),
     color: '#333',
   },
-  closeButton: {
-    backgroundColor: '#0F4473',
-    paddingVertical: h(1.2),
-    paddingHorizontal: w(10),
-    borderRadius: w(1.5),
-    elevation: 3,
-    marginTop: h(1),
+  modalTextTitle: {
+    color: '#E8304E',
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
+    fontSize: w(6),
+    marginTop: h(0.5),
+    marginBottom: w(2.2),
+  },
+  divider: {
+    width: w('70%'),
+    height: h(0.2),
+    backgroundColor: 'black',
+    borderRadius: w(4),
+    marginBottom: h(1.5),
+  },
+  descriptionContainer: {
+    marginBottom: h(1),
+    marginLeft: w(7),
+    marginRight: w(7),
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

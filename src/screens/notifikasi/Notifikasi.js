@@ -195,9 +195,11 @@ const Notifikasi = ({refreshTrigger, onUpdate}) => {
   const scheduleAlarm = async (schedules, type) => {
     const now = new Date();
 
-    for (const item of schedules) {
-      // Validasi Alarm yg Aktif
-      if (!item.aktifkan) continue;
+    const alarmPromises = schedules.map(async item => {
+      // Validasi Alarm jika tidak Aktif
+      if (!item.aktifkan) return;
+
+      if (item.kumpul === 1) return;
 
       let alarmDate;
 
@@ -219,7 +221,7 @@ const Notifikasi = ({refreshTrigger, onUpdate}) => {
           Sabtu: 6,
         };
         const hariAngka = daysOfWeek[item.hari];
-        if (!hariAngka) continue;
+        if (!hariAngka) return;
 
         const [hours, minutes] = item.jamMulai.split(':').map(Number);
         alarmDate = new Date(now);
@@ -290,7 +292,8 @@ const Notifikasi = ({refreshTrigger, onUpdate}) => {
       console.log(`Jadwal Alarm 1 hari Sblm: ${firstNotificationTime}`);
       console.log(`Jadwal Alarm 15 Menit Sblm: ${secondNotificationTime}`);
       console.log(`Jadwal Alarm Asli: ${alarmDate}`);
-    }
+    });
+    await Promise.all(alarmPromises);
   };
 
   const handleAlarmAction = async (item, jenisModal, type) => {
