@@ -23,28 +23,28 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
-    checkAsyncStorage();
+    // checkAsyncStorage();
   }, []);
 
-  const checkAsyncStorage = async () => {
-    const TdataModalStorage = await AsyncStorage.getItem('dataModalStorage');
-    const TjenisModalStorage = await AsyncStorage.getItem('jenisModalStorage');
-    console.log('Modal Tangkap Nilai : ', TdataModalStorage);
-    console.log('Modal tangkap Jenis : ', TjenisModalStorage);
+  // const checkAsyncStorage = async () => {
+  //   const TdataModalStorage = await AsyncStorage.getItem('dataModalStorage');
+  //   const TjenisModalStorage = await AsyncStorage.getItem('jenisModalStorage');
+  //   console.log('Modal Tangkap Nilai : ', TdataModalStorage);
+  //   console.log('Modal tangkap Jenis : ', TjenisModalStorage);
 
-    AsyncStorage.removeItem('showModal');
-    await AsyncStorage.removeItem('dataModalStorage');
-    await AsyncStorage.removeItem('jenisModalStorage');
+  //   AsyncStorage.removeItem('showModal');
+  //   await AsyncStorage.removeItem('dataModalStorage');
+  //   await AsyncStorage.removeItem('jenisModalStorage');
 
-    console.log(
-      'Berhasil hapus data Notifikasi dari AsyncStorage: ',
-      TdataModalStorage,
-    );
-    console.log(
-      'Berhasil hapus Jenis Modal Notifikasi dari AsyncStorage: ',
-      TjenisModalStorage,
-    );
-  };
+  //   console.log(
+  //     'Berhasil hapus data Notifikasi dari AsyncStorage: ',
+  //     TdataModalStorage,
+  //   );
+  //   console.log(
+  //     'Berhasil hapus Jenis Modal Notifikasi dari AsyncStorage: ',
+  //     TjenisModalStorage,
+  //   );
+  // };
 
   const deskripsi = () => {
     let data = [];
