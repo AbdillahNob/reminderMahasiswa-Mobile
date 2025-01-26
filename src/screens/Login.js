@@ -146,7 +146,7 @@ const Login = () => {
       <View
         style={{
           height: h('100%'),
-          backgroundColor: '#F0F4FF',
+          backgroundColor: '#F5F5F5',
           marginTop: h(35),
           borderTopLeftRadius: w(10),
           borderTopRightRadius: w(10),

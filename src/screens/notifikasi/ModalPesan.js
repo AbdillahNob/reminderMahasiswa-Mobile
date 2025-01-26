@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     width: w('82%'),
     paddingTop: w(4),
     paddingBottom: w(4),
-    backgroundColor: '#F0F4FF',
+    backgroundColor: '#F5F5F5',
     borderRadius: w(3),
     alignItems: 'center',
     elevation: 5,

@@ -328,7 +328,7 @@ export default EditJadwal;
 const styles = StyleSheet.create({
   container: {
     width: w('100%'),
-    backgroundColor: '#F0F4FF',
+    backgroundColor: '#F5F5F5',
     borderTopLeftRadius: w(8),
     borderTopRightRadius: w(8),
   },
