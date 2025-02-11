@@ -26,6 +26,9 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   useEffect(() => {
     getDatabase();
+    buatAkun();
+    buatJadwalKuliah();
+    buatJadwalTugas();
     cekAllTabel();
   }, []);
   return (

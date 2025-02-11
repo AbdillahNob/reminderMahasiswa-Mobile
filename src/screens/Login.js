@@ -118,7 +118,7 @@ const Login = () => {
               Alert.alert('INFO', 'Username dan Password anda salah!');
             }
           },
-          (tx, error) => {
+          async (tx, error) => {
             console.log(`Gagal Login : ${error}`);
           },
         );
