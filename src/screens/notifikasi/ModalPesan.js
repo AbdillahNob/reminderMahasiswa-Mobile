@@ -58,9 +58,9 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     } else {
       data = [
         {value: dataModal.namaMatkul},
+        {label: 'Tugas', value: dataModal.namaTugas},
         {label: 'Tanggal', value: dataModal.tanggal},
         {label: 'Kelas', value: dataModal.kelas},
-        {label: 'Pukul', value: dataModal.pukul},
       ];
     }
 
@@ -172,10 +172,12 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
               style={{width: w(16), height: h(8), elevation: 2}}
               resizeMode="contain"
             />
-            <Text style={styles.modalTextTitle}>kelas mengajar anda</Text>
+            <Text style={styles.modalTextTitle}>
+              {type === 'Tugas' ? 'jadwal tugas anda' : 'jadwal kuliah anda'}
+            </Text>
             <Text style={styles.modalText}>
               {type === 'Tugas'
-                ? dataModal.pukul
+                ? `Pukul : ${dataModal.pukul}`
                 : `${dataModal.jamMulai} - ${dataModal.jamSelesai}`}
             </Text>
             <View style={styles.divider} />

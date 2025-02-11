@@ -11,7 +11,7 @@ import {
   widthPercentageToDP as w,
   heightPercentageToDP as h,
 } from '../utils/responsive';
-import {useNavigation} from '@react-navigation/native';
+import {StackActions, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAkunDetail} from '../Database/Database';
 
@@ -105,7 +105,15 @@ const HeaderDashboard = ({idUser, dataJadwal, dataTugas}) => {
           try {
             await AsyncStorage.removeItem('idUser');
             Alert.alert('INFO', 'Berhasil Logout', [
-              {text: 'OKE', onPress: () => navigation.replace('Login')},
+              {
+                text: 'OK',
+                onPress: () => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Login'}],
+                  });
+                },
+              },
             ]);
           } catch (err) {
             console.log(`Gagal Logout: ${err}`);
