@@ -162,7 +162,7 @@ const TambahJadwal = () => {
       if (label == 'Semester') {
         data = [1, 2, 3, 4, 5, 6, 7];
       } else {
-        data = ['Utama', 'Tambahan'];
+        data = ['Reguler', 'Tambahan'];
       }
 
       content = (

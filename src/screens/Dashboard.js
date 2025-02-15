@@ -442,7 +442,9 @@ const Dashboard = () => {
                       <Text
                         style={{
                           color:
-                            item.tipeJadwal == 'Utama' ? '#E8304E' : '#0F4473',
+                            item.tipeJadwal == 'Reguler'
+                              ? '#E8304E'
+                              : '#0F4473',
                         }}>
                         {item.tipeJadwal}
                       </Text>
