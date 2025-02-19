@@ -187,7 +187,7 @@ const Notifikasi = ({refreshTrigger, onUpdate}) => {
       id: 'alarm-channel-v3',
       name: 'Alarm Pengingat Jadwal',
       importance: AndroidImportance.HIGH,
-      sound: 'alarm_tone',
+      sound: 'nada_niky',
       vibration: true,
     });
   };
@@ -253,7 +253,7 @@ const Notifikasi = ({refreshTrigger, onUpdate}) => {
               android: {
                 channelId: 'alarm-channel-v3',
                 color: AndroidColor.RED,
-                sound: 'alarm_tone',
+                sound: 'nada_niky',
                 ongoing: true,
                 loopSound: true,
                 importance: AndroidImportance.HIGH,

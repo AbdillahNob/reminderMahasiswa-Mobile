@@ -20,6 +20,12 @@ import {
   cekAllTabel,
   hapusTabel,
 } from './src/Database/Database';
+// import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
+// GoogleSignin.configure({
+//   scopes: ['https://www.googleapis.com/auth/drive'], // Ubah scope agar bisa baca/tulis Drive
+//   webClientId: 'YOUR_WEB_CLIENT_ID',
+// });
 
 const Stack = createNativeStackNavigator();
 

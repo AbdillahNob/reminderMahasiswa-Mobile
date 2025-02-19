@@ -15,36 +15,29 @@ import {
 } from '../../utils/responsive';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {updateKumpulTugas} from '../../Database/Database';
+// import DocumentPicker from 'react-native-document-picker';
+// import {GoogleSignin} from '@react-native-google-signin/google-signin';
+// import RNFS from 'react-native-fs';
 
 const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [jenisModal, setJenisModal] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // GoogleSignin.configure({
+  //   scopes: ['https://www.googleapis.com/auth/drive.file'],
+  //   webClientId: 'YOUR_WEB_CLIENT_ID', // Ganti dengan Web Client ID dari Google Console
+  // });
+
+  // GoogleSignin.configure({
+  //   scopes: ['https://www.googleapis.com/auth/drive'],
+  //   webClientId: 'YOUR_WEB_CLIENT_ID',
+  // });
+
   useEffect(() => {
     setJenisModal(dataModalJenis);
     // checkAsyncStorage();
   }, []);
-
-  // const checkAsyncStorage = async () => {
-  //   const TdataModalStorage = await AsyncStorage.getItem('dataModalStorage');
-  //   const TjenisModalStorage = await AsyncStorage.getItem('jenisModalStorage');
-  //   console.log('Modal Tangkap Nilai : ', TdataModalStorage);
-  //   console.log('Modal tangkap Jenis : ', TjenisModalStorage);
-
-  //   AsyncStorage.removeItem('showModal');
-  //   await AsyncStorage.removeItem('dataModalStorage');
-  //   await AsyncStorage.removeItem('jenisModalStorage');
-
-  //   console.log(
-  //     'Berhasil hapus data Notifikasi dari AsyncStorage: ',
-  //     TdataModalStorage,
-  //   );
-  //   console.log(
-  //     'Berhasil hapus Jenis Modal Notifikasi dari AsyncStorage: ',
-  //     TjenisModalStorage,
-  //   );
-  // };
 
   const deskripsi = () => {
     let data = [];
@@ -98,6 +91,111 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     setModalVisible(false);
   };
 
+  // const pickDocument = async () => {
+  //   try {
+  //     const result = await DocumentPicker.pick({
+  //       type: [
+  //         DocumentPicker.types.pdf,
+  //         DocumentPicker.types.doc,
+  //         DocumentPicker.types.docx,
+  //       ],
+  //     });
+  //     console.log('File terpilih:', result);
+  //     return result[0]; // Mengembalikan file yang dipilih
+  //   } catch (err) {
+  //     if (DocumentPicker.isCancel(err)) {
+  //       console.log('Pemilihan file dibatalkan');
+  //     } else {
+  //       console.error(err);
+  //     }
+  //   }
+  // };
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+  //     const userInfo = await GoogleSignin.signIn();
+  //     const tokens = await GoogleSignin.getTokens();
+  //     console.log('User Info:', userInfo);
+  //     console.log('Access Token:', tokens.accessToken);
+
+  //     if (!tokens.accessToken) {
+  //       Alert.alert('Error', 'Gagal mendapatkan Access token dari google');
+  //       return null;
+  //     }
+
+  //     return tokens.accessToken;
+  //   } catch (error) {
+  //     console.error('Error login Google:', error);
+  //   }
+  // };
+
+  // const uploadToGoogleDrive = async file => {
+  //   try {
+  //     const accessToken = await signInWithGoogle();
+  //     if (!accessToken) {
+  //       Alert.alert('Error', 'Gagal mendapatkan akses Google');
+  //       return false; // Kembalikan false jika gagal login
+  //     }
+
+  //     const fileMetadata = {
+  //       name: file.name,
+  //       mimeType: file.type,
+  //     };
+
+  //     const form = new FormData();
+  //     // form.append(
+  //     //   'metadata',
+  //     //   new Blob([JSON.stringify(fileMetadata)], {type: 'application/json'}),
+  //     // );
+  //     form.append('metadata', {
+  //       string: JSON.stringify(fileMetadata),
+  //       type: 'application/json',
+  //     });
+
+  //     form.append('file', {
+  //       uri: file.uri,
+  //       type: file.type,
+  //       name: file.name,
+  //     });
+
+  //     const response = await fetch(
+  //       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //         body: form,
+  //       },
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error(`Upload gagal dengan status ${response.status}`);
+  //     }
+
+  //     const result = await response.json();
+  //     console.log('File berhasil diunggah:', result);
+  //     Alert.alert('Sukses', 'File berhasil diunggah ke Google Drive');
+  //     return true; // Berhasil upload
+  //   } catch (error) {
+  //     console.error('Error mengunggah:', error);
+  //     return false; // Gagal upload
+  //   }
+  // };
+
+  // const handleUpload = async () => {
+  //   const file = await pickDocument();
+  //   if (file) {
+  //     const success = await uploadToGoogleDrive(file); // Tungg Upload ke Google Drive smpi Selesai
+  //     if (success) {
+  //       cekListTugas();
+  //     } else {
+  //       Alert.alert('INFO', 'Gagal Upload File ke GoogleDrive');
+  //     }
+  //   }
+  // };
+
   const cekListTugas = async () => {
     if (isProcessing) return;
     setIsProcessing(true);
@@ -134,11 +232,11 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
       const data =
         ket === 'sekarang'
           ? [
-              {value: 'Tugas ini telah saya kumpulkan'},
+              {value: 'Tugas ini telah saya Kumpul'},
               {value: 'Tugas ini tidak saya kumpulkan'},
             ]
           : [
-              {value: 'Tugas ini telah saya kumpulkan'},
+              {value: 'Tugas ini telah saya Kumpul'},
               {value: 'Tugas ini sedang saya kerjakan'},
             ];
       return data.map(({value}, key) => (
@@ -146,7 +244,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
           <TouchableOpacity
             style={styles.buttonModal}
             onPress={() =>
-              value === 'Tugas ini telah saya kumpulkan'
+              value === 'Tugas ini telah saya Kumpul'
                 ? cekListTugas()
                 : closeModal()
             }>
