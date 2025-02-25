@@ -16,7 +16,7 @@ import {
 import {StatusBar} from 'react-native';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import {StackActions, useNavigation} from '@react-navigation/native';
-import {insertJadwalTugas} from '../../../Database/Database';
+import insertJadwalTugas from '../../../Database/Database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TambahTugas = () => {

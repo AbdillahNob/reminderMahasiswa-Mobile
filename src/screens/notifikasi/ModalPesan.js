@@ -15,28 +15,18 @@ import {
 } from '../../utils/responsive';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {updateKumpulTugas} from '../../Database/Database';
-// import DocumentPicker from 'react-native-document-picker';
-// import {GoogleSignin} from '@react-native-google-signin/google-signin';
-// import RNFS from 'react-native-fs';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 
 const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [jenisModal, setJenisModal] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // GoogleSignin.configure({
-  //   scopes: ['https://www.googleapis.com/auth/drive.file'],
-  //   webClientId: 'YOUR_WEB_CLIENT_ID', // Ganti dengan Web Client ID dari Google Console
-  // });
-
-  // GoogleSignin.configure({
-  //   scopes: ['https://www.googleapis.com/auth/drive'],
-  //   webClientId: 'YOUR_WEB_CLIENT_ID',
-  // });
+  const [filePath, setFilePath] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(null);
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
-    // checkAsyncStorage();
   }, []);
 
   const deskripsi = () => {
@@ -91,127 +81,115 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     setModalVisible(false);
   };
 
-  // const pickDocument = async () => {
-  //   try {
-  //     const result = await DocumentPicker.pick({
-  //       type: [
-  //         DocumentPicker.types.pdf,
-  //         DocumentPicker.types.doc,
-  //         DocumentPicker.types.docx,
-  //       ],
-  //     });
-  //     console.log('File terpilih:', result);
-  //     return result[0]; // Mengembalikan file yang dipilih
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       console.log('Pemilihan file dibatalkan');
-  //     } else {
-  //       console.error(err);
-  //     }
-  //   }
-  // };
-  // const signInWithGoogle = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-  //     const userInfo = await GoogleSignin.signIn();
-  //     const tokens = await GoogleSignin.getTokens();
-  //     console.log('User Info:', userInfo);
-  //     console.log('Access Token:', tokens.accessToken);
+  const pickFile = async () => {
+    try {
+      const result = await DocumentPicker.pick({
+        type: [
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.doc,
+          DocumentPicker.types.docx,
+        ],
+      });
 
-  //     if (!tokens.accessToken) {
-  //       Alert.alert('Error', 'Gagal mendapatkan Access token dari google');
-  //       return null;
-  //     }
+      if (!result || result.length === 0) {
+        Alert.alert('Dibatalkan', 'Pemilihan file dibatalkan');
+        return null;
+      }
 
-  //     return tokens.accessToken;
-  //   } catch (error) {
-  //     console.error('Error login Google:', error);
-  //   }
-  // };
+      return result[0];
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        Alert.alert('Dibatalkan', 'Pemilihan file dibatalkan');
+      } else {
+        Alert.alert('Error', 'Gagal memilih file: ' + err.message);
+      }
+      return null;
+    }
+  };
 
-  // const uploadToGoogleDrive = async file => {
-  //   try {
-  //     const accessToken = await signInWithGoogle();
-  //     if (!accessToken) {
-  //       Alert.alert('Error', 'Gagal mendapatkan akses Google');
-  //       return false; // Kembalikan false jika gagal login
-  //     }
+  const getDestinationFolder = async () => {
+    // Define default location in app's document directory
+    const appFolder = `${RNFS.DocumentDirectoryPath}/TugasMahasiswa`;
 
-  //     const fileMetadata = {
-  //       name: file.name,
-  //       mimeType: file.type,
-  //     };
+    try {
+      // Check if directory exists, if not create it
+      const exists = await RNFS.exists(appFolder);
+      if (!exists) {
+        await RNFS.mkdir(appFolder);
+      }
 
-  //     const form = new FormData();
-  //     // form.append(
-  //     //   'metadata',
-  //     //   new Blob([JSON.stringify(fileMetadata)], {type: 'application/json'}),
-  //     // );
-  //     form.append('metadata', {
-  //       string: JSON.stringify(fileMetadata),
-  //       type: 'application/json',
-  //     });
+      // Create a subfolder with subject name if available
+      let subjectFolder = appFolder;
+      if (dataModal.namaMatkul) {
+        subjectFolder = `${appFolder}/${dataModal.namaMatkul.replace(
+          /[^a-zA-Z0-9]/g,
+          '_',
+        )}`;
+        const subjectFolderExists = await RNFS.exists(subjectFolder);
+        if (!subjectFolderExists) {
+          await RNFS.mkdir(subjectFolder);
+        }
+      }
 
-  //     form.append('file', {
-  //       uri: file.uri,
-  //       type: file.type,
-  //       name: file.name,
-  //     });
+      return subjectFolder;
+    } catch (error) {
+      console.error('Error creating folder:', error);
+      // Return default folder if something went wrong
+      return appFolder;
+    }
+  };
 
-  //     const response = await fetch(
-  //       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-  //       {
-  //         method: 'POST',
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //         body: form,
-  //       },
-  //     );
+  const handleUpload = async () => {
+    if (isProcessing) {
+      return;
+    }
 
-  //     if (!response.ok) {
-  //       throw new Error(`Upload gagal dengan status ${response.status}`);
-  //     }
-
-  //     const result = await response.json();
-  //     console.log('File berhasil diunggah:', result);
-  //     Alert.alert('Sukses', 'File berhasil diunggah ke Google Drive');
-  //     return true; // Berhasil upload
-  //   } catch (error) {
-  //     console.error('Error mengunggah:', error);
-  //     return false; // Gagal upload
-  //   }
-  // };
-
-  // const handleUpload = async () => {
-  //   const file = await pickDocument();
-  //   if (file) {
-  //     const success = await uploadToGoogleDrive(file); // Tungg Upload ke Google Drive smpi Selesai
-  //     if (success) {
-  //       cekListTugas();
-  //     } else {
-  //       Alert.alert('INFO', 'Gagal Upload File ke GoogleDrive');
-  //     }
-  //   }
-  // };
-
-  const cekListTugas = async () => {
-    if (isProcessing) return;
     setIsProcessing(true);
 
     try {
-      const hasilKumpul = !dataModal.kumpul;
-
-      await updateKumpulTugas(dataModal.idTugas, hasilKumpul);
-      if (onUpdate) {
-        onUpdate(dataModal.idTugas, hasilKumpul);
+      // First pick the file
+      const fileResult = await pickFile();
+      if (!fileResult) {
+        setIsProcessing(false);
+        return;
       }
 
+      // Get the destination folder
+      const folderPath = await getDestinationFolder();
+
+      // Get file details
+      const sourcePath = fileResult.uri;
+      const fileName = fileResult.name;
+      const destPath = `${folderPath}/${fileName}`;
+
+      // Check if file already exists
+      const fileExists = await RNFS.exists(destPath);
+      if (fileExists) {
+        const timestamp = new Date().getTime();
+        const newFileName = `${fileName.split('.')[0]}_${timestamp}.${fileName
+          .split('.')
+          .pop()}`;
+        destPath = `${folderPath}/${newFileName}`;
+      }
+
+      // Copy file to destination
+      await RNFS.copyFile(sourcePath, destPath);
+      setFilePath(destPath);
+
+      // Update task status in database
+      await updateKumpulTugas(dataModal.idTugas, true);
+      if (onUpdate) {
+        onUpdate(dataModal.idTugas, true);
+      }
+
+      // Save the file path to use it later if needed
+      await AsyncStorage.setItem(`task_file_${dataModal.idTugas}`, destPath);
+
       setModalVisible(false);
-      Alert.alert('Info', 'Save pengumpulan tugas berhasil');
+      Alert.alert('Sukses', `Tugas berhasil disimpan di ${destPath}`);
     } catch (error) {
-      console.log('Error CekListTugas : ', error);
+      console.error('Error handling upload:', error);
+      Alert.alert('Error', 'Gagal menyimpan file: ' + error.message);
     } finally {
       setIsProcessing(false);
     }
@@ -231,12 +209,9 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     } else {
       const data =
         ket === 'sekarang'
-          ? [
-              {value: 'Tugas ini telah saya Kumpul'},
-              {value: 'Tugas ini tidak saya kumpulkan'},
-            ]
+          ? [{value: 'Upload Tugas'}, {value: 'Tugas ini tidak saya kumpulkan'}]
           : [
-              {value: 'Tugas ini telah saya Kumpul'},
+              {value: 'Upload Tugas'},
               {value: 'Tugas ini sedang saya kerjakan'},
             ];
       return data.map(({value}, key) => (
@@ -244,9 +219,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
           <TouchableOpacity
             style={styles.buttonModal}
             onPress={() =>
-              value === 'Tugas ini telah saya Kumpul'
-                ? cekListTugas()
-                : closeModal()
+              value === 'Upload Tugas' ? handleUpload() : closeModal()
             }>
             <Text style={styles.buttonModalText}>{value}</Text>
           </TouchableOpacity>
@@ -280,7 +253,15 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
             </Text>
             <View style={styles.divider} />
             <View style={styles.descriptionContainer}>{deskripsi()}</View>
-            {button(jenisModal)}
+            {isProcessing ? (
+              <View style={{marginVertical: h(2)}}>
+                <Text style={{color: '#0F4473', fontSize: w(4)}}>
+                  Sedang memproses...
+                </Text>
+              </View>
+            ) : (
+              button(jenisModal)
+            )}
           </View>
         </View>
       </Modal>

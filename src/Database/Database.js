@@ -173,7 +173,7 @@ export const buatJadwalTugas = async () => {
   // console.log(data);
 };
 
-// Create AKUN
+// Create data AKUN
 export const insertAkun = async (
   namaLengkap,
   nim,
@@ -203,7 +203,7 @@ export const insertAkun = async (
   }
 };
 
-// Create Jadwal
+// Create data JadwalKuliah
 export const insertJadwalKuliah = async (
   idUser,
   namaMatkul,
@@ -251,7 +251,8 @@ export const insertJadwalKuliah = async (
   }
 };
 
-export const insertJadwalTugas = async (
+// Create data jadwalTugas
+export default async (
   idUser,
   namaMatkul,
   namaTugas,
@@ -299,7 +300,7 @@ export const insertJadwalTugas = async (
   }
 };
 
-// Read Data Akun
+// Tampilkan Data Akun
 export const getAkun = async () => {
   try {
     const db = await getDatabase();
@@ -330,7 +331,7 @@ export const getAkun = async () => {
   }
 };
 
-// Read Data Akun Detail
+// Tampilkan Data Akun Detail
 export const getAkunDetail = async idUser => {
   try {
     const db = await getDatabase();
@@ -361,7 +362,7 @@ export const getAkunDetail = async idUser => {
   }
 };
 
-// Read Data Jadwal
+// Tampilkan Data Jadwal
 export const getJadwalKuliah = async idUser => {
   try {
     const db = await getDatabase();
