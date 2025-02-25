@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -24,6 +26,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [filePath, setFilePath] = useState('');
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [isFolderSelectionMode, setIsFolderSelectionMode] = useState(false);
 
   useEffect(() => {
     setJenisModal(dataModalJenis);
@@ -81,6 +84,137 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     setModalVisible(false);
   };
 
+  // Fungsi untuk meminta izin penyimpanan (untuk Android)
+  const requestStoragePermission = async () => {
+    if (Platform.OS !== 'android') {
+      return true;
+    }
+
+    try {
+      if (parseInt(Platform.Version, 10) >= 33) {
+        // Untuk Android 13 ke atas (API 33+)
+        const permissions = [
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+        ];
+
+        const grantedPermissions = await PermissionsAndroid.requestMultiple(
+          permissions,
+        );
+
+        return (
+          grantedPermissions['android.permission.READ_MEDIA_IMAGES'] ===
+            'granted' ||
+          grantedPermissions['android.permission.READ_MEDIA_VIDEO'] ===
+            'granted' ||
+          grantedPermissions['android.permission.READ_MEDIA_AUDIO'] ===
+            'granted'
+        );
+      } else {
+        // Untuk Android 12 ke bawah
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Izin Penyimpanan',
+            message:
+              'Aplikasi memerlukan akses ke penyimpanan untuk menyimpan file',
+            buttonNeutral: 'Tanya Nanti',
+            buttonNegative: 'Batal',
+            buttonPositive: 'OK',
+          },
+        );
+
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    } catch (err) {
+      console.error('Error requesting permissions:', err);
+      return false;
+    }
+  };
+
+  // Fungsi untuk memilih folder
+  const pickFolder = async () => {
+    setIsFolderSelectionMode(true);
+
+    // Cek dan minta izin penyimpanan jika belum
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      Alert.alert(
+        'Izin Diperlukan',
+        'Aplikasi memerlukan izin penyimpanan untuk menyimpan file',
+      );
+      setIsFolderSelectionMode(false);
+      return;
+    }
+
+    try {
+      // Tampilkan opsi folder yang tersedia
+      const options = [
+        {
+          label: 'Folder Unduhan (Download)',
+          value: RNFS.DownloadDirectoryPath,
+        },
+        {
+          label: 'Folder Gambar',
+          value: RNFS.PicturesDirectoryPath,
+        },
+      ];
+
+      // Filter opsi yang tersedia (beberapa mungkin tidak tersedia di semua perangkat)
+      const availableOptions = await Promise.all(
+        options.map(async option => {
+          if (option.value) {
+            try {
+              const exists = await RNFS.exists(option.value);
+              return exists ? option : null;
+            } catch (err) {
+              return null;
+            }
+          }
+          return null;
+        }),
+      );
+
+      const filteredOptions = availableOptions.filter(Boolean);
+
+      if (filteredOptions.length === 0) {
+        Alert.alert(
+          'Error',
+          'Tidak dapat menemukan folder yang tersedia di perangkat Anda',
+        );
+        setIsFolderSelectionMode(false);
+        return;
+      }
+
+      // Tampilkan dialog untuk memilih folder
+      Alert.alert(
+        'Pilih Lokasi Penyimpanan',
+        'Silakan pilih folder untuk menyimpan file:',
+        [
+          ...filteredOptions.map(option => ({
+            text: option.label,
+            onPress: () => {
+              setSelectedFolder(option.value);
+              setIsFolderSelectionMode(false);
+              // Setelah memilih folder, langsung pilih file
+              pickFileAndUpload(option.value);
+            },
+          })),
+          {
+            text: 'Batal',
+            style: 'cancel',
+            onPress: () => setIsFolderSelectionMode(false),
+          },
+        ],
+      );
+    } catch (error) {
+      console.error('Error picking folder:', error);
+      Alert.alert('Error', 'Gagal memilih folder: ' + error.message);
+      setIsFolderSelectionMode(false);
+    }
+  };
+
   const pickFile = async () => {
     try {
       const result = await DocumentPicker.pick({
@@ -88,6 +222,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
           DocumentPicker.types.pdf,
           DocumentPicker.types.doc,
           DocumentPicker.types.docx,
+          DocumentPicker.types.images,
         ],
       });
 
@@ -107,39 +242,12 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     }
   };
 
-  const getDestinationFolder = async () => {
-    // Define default location in app's document directory
-    const appFolder = `${RNFS.DocumentDirectoryPath}/TugasMahasiswa`;
-
-    try {
-      // Check if directory exists, if not create it
-      const exists = await RNFS.exists(appFolder);
-      if (!exists) {
-        await RNFS.mkdir(appFolder);
-      }
-
-      // Create a subfolder with subject name if available
-      let subjectFolder = appFolder;
-      if (dataModal.namaMatkul) {
-        subjectFolder = `${appFolder}/${dataModal.namaMatkul.replace(
-          /[^a-zA-Z0-9]/g,
-          '_',
-        )}`;
-        const subjectFolderExists = await RNFS.exists(subjectFolder);
-        if (!subjectFolderExists) {
-          await RNFS.mkdir(subjectFolder);
-        }
-      }
-
-      return subjectFolder;
-    } catch (error) {
-      console.error('Error creating folder:', error);
-      // Return default folder if something went wrong
-      return appFolder;
-    }
+  const getFolderName = folderPath => {
+    const parts = folderPath.split('/');
+    return parts[parts.length - 1] || 'folder yang dipilih';
   };
 
-  const handleUpload = async () => {
+  const pickFileAndUpload = async folderPath => {
     if (isProcessing) {
       return;
     }
@@ -147,52 +255,94 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
     setIsProcessing(true);
 
     try {
-      // First pick the file
+      // Pilih file
       const fileResult = await pickFile();
       if (!fileResult) {
         setIsProcessing(false);
         return;
       }
 
-      // Get the destination folder
-      const folderPath = await getDestinationFolder();
+      // Memastikan folder utama ada
+      const mainFolder = folderPath;
+      const appFolder = `${mainFolder}`;
 
-      // Get file details
+      try {
+        const exists = await RNFS.exists(appFolder);
+        if (!exists) {
+          await RNFS.mkdir(appFolder);
+        }
+      } catch (err) {
+        console.error('Error creating app folder:', err);
+        // Jika gagal membuat folder TugasMahasiswa, gunakan folder utama
+      }
+
+      // Buat subfolder dengan nama mata kuliah jika tersedia
+      let destinationFolder = appFolder;
+      if (dataModal.namaMatkul) {
+        const subjectFolder = `${appFolder}/${dataModal.namaMatkul.replace(
+          /[^a-zA-Z0-9]/g,
+          '_',
+        )}`;
+
+        try {
+          const subjectFolderExists = await RNFS.exists(subjectFolder);
+          if (!subjectFolderExists) {
+            await RNFS.mkdir(subjectFolder);
+          }
+          destinationFolder = subjectFolder;
+        } catch (err) {
+          console.error('Error creating subject folder:', err);
+          // Jika gagal membuat folder mata kuliah, gunakan folder aplikasi
+        }
+      }
+
+      // Ambil detail file
       const sourcePath = fileResult.uri;
       const fileName = fileResult.name;
-      const destPath = `${folderPath}/${fileName}`;
+      let destPath = `${destinationFolder}/${fileName}`;
 
-      // Check if file already exists
+      // Periksa jika file sudah ada
       const fileExists = await RNFS.exists(destPath);
       if (fileExists) {
         const timestamp = new Date().getTime();
         const newFileName = `${fileName.split('.')[0]}_${timestamp}.${fileName
           .split('.')
           .pop()}`;
-        destPath = `${folderPath}/${newFileName}`;
+        destPath = `${destinationFolder}/${newFileName}`;
       }
 
-      // Copy file to destination
+      // Salin file ke tujuan
       await RNFS.copyFile(sourcePath, destPath);
       setFilePath(destPath);
 
-      // Update task status in database
+      // Perbarui status tugas di database
       await updateKumpulTugas(dataModal.idTugas, true);
       if (onUpdate) {
         onUpdate(dataModal.idTugas, true);
       }
 
-      // Save the file path to use it later if needed
+      // Simpan jalur file untuk digunakan nanti jika diperlukan
       await AsyncStorage.setItem(`task_file_${dataModal.idTugas}`, destPath);
 
       setModalVisible(false);
-      Alert.alert('Sukses', `Tugas berhasil disimpan di ${destPath}`);
+      Alert.alert(
+        'Sukses',
+        `File berhasil disimpan di ${getFolderName(
+          folderPath,
+        )}.\n\nLokasi lengkap: ${destPath}`,
+        [{text: 'OK'}],
+      );
     } catch (error) {
       console.error('Error handling upload:', error);
       Alert.alert('Error', 'Gagal menyimpan file: ' + error.message);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleUpload = async () => {
+    // Mulai proses dengan memilih folder
+    await pickFolder();
   };
 
   const button = ket => {
@@ -220,7 +370,8 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
             style={styles.buttonModal}
             onPress={() =>
               value === 'Upload Tugas' ? handleUpload() : closeModal()
-            }>
+            }
+            disabled={isProcessing || isFolderSelectionMode}>
             <Text style={styles.buttonModalText}>{value}</Text>
           </TouchableOpacity>
         </View>
@@ -257,6 +408,12 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
               <View style={{marginVertical: h(2)}}>
                 <Text style={{color: '#0F4473', fontSize: w(4)}}>
                   Sedang memproses...
+                </Text>
+              </View>
+            ) : isFolderSelectionMode ? (
+              <View style={{marginVertical: h(2)}}>
+                <Text style={{color: '#0F4473', fontSize: w(4)}}>
+                  Silakan pilih folder...
                 </Text>
               </View>
             ) : (
