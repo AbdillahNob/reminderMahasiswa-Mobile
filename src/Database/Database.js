@@ -1,39 +1,11 @@
 import React from 'react';
 import SQLite from 'react-native-sqlite-storage';
 
-import {PermissionsAndroid} from 'react-native';
-
 SQLite.enablePromise(true);
-
-// async function requestStoragePermission() {
-//   try {
-//     const granted = await PermissionsAndroid.request(
-//       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-//       {
-//         title: 'Izin Akses Penyimpanan',
-//         message: 'Aplikasi memerlukan izin untuk menyimpan data.',
-//         buttonNeutral: 'Tanya Nanti',
-//         buttonNegative: 'Tolak',
-//         buttonPositive: 'Setuju',
-//       },
-//     );
-//     return granted === PermissionsAndroid.RESULTS.GRANTED;
-//   } catch (err) {
-//     console.warn(err);
-//     return false;
-//   }
-// }
 
 // Buat Database
 export const openDb = async () => {
-  // const hasPermission = await requestStoragePermission();
   try {
-    // if (!hasPermission) {
-    //   console.warn('Izin menyimpan data di perangkat tidak di izinkan');
-    //   return null;
-    // }
-    // console.log('IZIN penyimpanan diberikan, membuka database....');
-
     const db = await SQLite.openDatabase({
       name: 'AlarmMahasiswa.db',
       location: 'default',

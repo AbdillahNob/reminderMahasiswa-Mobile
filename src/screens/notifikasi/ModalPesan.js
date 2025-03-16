@@ -395,7 +395,7 @@ const ModalPesan = ({dataModal, dataModalJenis, type, onUpdate}) => {
               resizeMode="contain"
             />
             <Text style={styles.modalTextTitle}>
-              {type === 'Tugas' ? 'jadwal tugas anda' : 'jadwal kuliah anda'}
+              {type === 'Tugas' ? 'jadwal kumpul tugas' : 'jadwal kuliah anda'}
             </Text>
             <Text style={styles.modalText}>
               {type === 'Tugas'
